@@ -6,11 +6,10 @@ import time
 from os.path import join
 
 import numpy as np
+import pronucompass.descriptors.topo_traj as tt
 import seaborn as sns
 from matplotlib import pyplot as plt
 from numba import njit
-
-import pronucompass.descriptors.topo_traj as tt
 
 
 @njit(parallel=False)
@@ -28,7 +27,7 @@ def calc_dist(atom1_coords, atom2_coords):
     dx = atom1_coords[0] - atom2_coords[0]
     dy = atom1_coords[1] - atom2_coords[1]
     dz = atom1_coords[2] - atom2_coords[2]
-    return np.sqrt(dx ** 2 + dy ** 2 + dz ** 2)
+    return np.sqrt(dx**2 + dy**2 + dz**2)
 
 
 @njit(parallel=False)
@@ -51,9 +50,11 @@ def calc_min_dist(coords1, coords2):
     min_dist_squared = np.inf
     for i in range(n1):
         for j in range(n2):
-            dist_squared = ((coords1[i][0] - coords2[j][0]) ** 2 +
-                            (coords1[i][1] - coords2[j][1]) ** 2 +
-                            (coords1[i][2] - coords2[j][2]) ** 2)
+            dist_squared = (
+                (coords1[i][0] - coords2[j][0]) ** 2
+                + (coords1[i][1] - coords2[j][1]) ** 2
+                + (coords1[i][2] - coords2[j][2]) ** 2
+            )
             if dist_squared < min_dist_squared:
                 min_dist_squared = dist_squared
     return np.sqrt(min_dist_squared)
@@ -104,7 +105,7 @@ def find_sb(frame_coords, oxy_i, nitro_j, k):
     # Constants
     n1 = oxy_i.size
     n2 = nitro_j.size
-    min_dist_squared = k ** k
+    min_dist_squared = k**k
 
     # Find minimum distance using square values to save time
     for i in range(n1):
@@ -112,17 +113,18 @@ def find_sb(frame_coords, oxy_i, nitro_j, k):
         for j in range(n2):
             coords2 = frame_coords[nitro_j[j]]
 
-            dist_squared = ((coords1[0] - coords2[0]) ** 2 +
-                            (coords1[1] - coords2[1]) ** 2 +
-                            (coords1[2] - coords2[2]) ** 2)
+            dist_squared = (
+                (coords1[0] - coords2[0]) ** 2
+                + (coords1[1] - coords2[1]) ** 2
+                + (coords1[2] - coords2[2]) ** 2
+            )
             if dist_squared < min_dist_squared:
                 return True
     return False
 
 
 @njit(parallel=False)
-def find_hb(frame_coords, donors_i, hydros_i, acceptors_j, da_cut, ha_cut,
-            dha_cut):
+def find_hb(frame_coords, donors_i, hydros_i, acceptors_j, da_cut, ha_cut, dha_cut):
     """
     Find a single hydrogen bond between two residues
     Args:
@@ -191,7 +193,7 @@ def save_matrix(arr, n, missing, out_name, norm=False, prec=2):
     matrix[missing, :] = matrix[:, missing] = 0
 
     # Save matrix
-    np.savetxt(out_name, matrix, fmt=f'%.{prec}f')
+    np.savetxt(out_name, matrix, fmt=f"%.{prec}f")
     return matrix
 
 
@@ -207,7 +209,7 @@ def get_matrix_name(out_dir, title, suffix):
     Returns:
         matrix_name: name of the matrix
     """
-    return join(out_dir, f'{title}_{suffix}.mat')
+    return join(out_dir, f"{title}_{suffix}.mat")
 
 
 def plot_matrix(matrix, output_name):
@@ -219,50 +221,60 @@ def plot_matrix(matrix, output_name):
         output_name: output name for the plot
     """
     plt.figure(figsize=(10, 8))
-    ax = sns.heatmap(matrix, cmap='jet',
-                     cbar_kws={'label': 'Covariance Value'})
-    plt.title('Generalized Correlation Matrix Heatmap')
-    plt.xlabel('Residue Index')
-    plt.ylabel('Residue Index')
+    ax = sns.heatmap(matrix, cmap="jet", cbar_kws={"label": "Covariance Value"})
+    plt.title("Generalized Correlation Matrix Heatmap")
+    plt.xlabel("Residue Index")
+    plt.ylabel("Residue Index")
     plt.savefig(output_name)
     plt.close()
 
 
-def process_matrices(arg, n, calphas, ave_min_dist, occ_nb, cp, occ_sb, occ_hb,
-                     occ_int, mi, gc, first_timer):
+def process_matrices(
+    arg,
+    n,
+    calphas,
+    ave_min_dist,
+    occ_nb,
+    cp,
+    occ_sb,
+    occ_hb,
+    occ_int,
+    mi,
+    gc,
+    first_timer,
+):
     # Declare missin residues
     cp_miss = [i for i, x in enumerate(calphas) if calphas[x] == -1]
 
     # Declare matrices to process
     matrices = {
-        "MINDIST": {'data': ave_min_dist, 'miss': [], 'norm': False,
-                    'prec': 4},
-        "NONBOND": {'data': occ_nb, 'miss': [], 'norm': False, 'prec': 4},
-        "SALTBRIDGES": {'data': occ_sb, 'miss': [], 'norm': False,
-                        'prec': 4},
-        "HBONDS": {'data': occ_hb, 'miss': [], 'norm': False, 'prec': 4},
-        "INTERACTIONS": {'data': occ_int, 'miss': [], 'norm': False,
-                         'prec': 2},
-        "COMMPROP": {'data': cp, 'miss': cp_miss, 'norm': True, 'prec': 4},
-        "MI": {'data': mi, 'miss': cp_miss, 'norm': False, 'prec': 4},
-        "GC": {'data': gc, 'miss': cp_miss, 'norm': False, 'prec': 4}
+        "MINDIST": {"data": ave_min_dist, "miss": [], "norm": False, "prec": 4},
+        "NONBOND": {"data": occ_nb, "miss": [], "norm": False, "prec": 4},
+        "SALTBRIDGES": {"data": occ_sb, "miss": [], "norm": False, "prec": 4},
+        "HBONDS": {"data": occ_hb, "miss": [], "norm": False, "prec": 4},
+        "INTERACTIONS": {"data": occ_int, "miss": [], "norm": False, "prec": 2},
+        "COMMPROP": {"data": cp, "miss": cp_miss, "norm": True, "prec": 4},
+        "MI": {"data": mi, "miss": cp_miss, "norm": False, "prec": 4},
+        "GC": {"data": gc, "miss": cp_miss, "norm": False, "prec": 4},
     }
 
     # Process matrices
     for matrix in matrices:
-        data = matrices[matrix]['data']
-        miss_list = matrices[matrix]['miss']
-        normalize = matrices[matrix]['norm']
-        precision = matrices[matrix]['prec']
+        data = matrices[matrix]["data"]
+        miss_list = matrices[matrix]["miss"]
+        normalize = matrices[matrix]["norm"]
+        precision = matrices[matrix]["prec"]
         matrix_name = get_matrix_name(arg.out_dir, arg.title, matrix)
-        matrix_data = save_matrix(data, n, miss_list, matrix_name,
-                                  norm=normalize, prec=precision)
-        matrices[matrix].update({'data': matrix_data})
-        plot_matrix(matrix_data, matrix_name.replace('.mat', '.png'))
+        matrix_data = save_matrix(
+            data, n, miss_list, matrix_name, norm=normalize, prec=precision
+        )
+        matrices[matrix].update({"data": matrix_data})
+        plot_matrix(matrix_data, matrix_name.replace(".mat", ".png"))
 
     saving_time = round(time.time() - first_timer, 2)
-    print(f'Until saving & plotting matrices: {saving_time} s')
+    print(f"Until saving & plotting matrices: {saving_time} s")
     return matrices
+
 
 #
 # # todo: specify correct diagonal filling behaviour

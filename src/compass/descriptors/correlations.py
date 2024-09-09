@@ -3,7 +3,6 @@
 Functions related to the calculation of correlations
 """
 import numpy as np
-
 from numba import njit
 
 
@@ -39,11 +38,11 @@ def calculate_mi_and_gc(cov_mat, num_atoms_per_residue):
                         var_i += cov_mat[idx_i, idx_i]
                         var_j += cov_mat[idx_j, idx_j]
 
-            cov_ij /= num_atoms_per_residue ** 2
+            cov_ij /= num_atoms_per_residue**2
             var_i /= num_atoms_per_residue
             var_j /= num_atoms_per_residue
 
-            div_term = (cov_ij ** 2) / (var_i * var_j)
+            div_term = (cov_ij**2) / (var_i * var_j)
             MI_score = np.float32(0.5 * np.log(1 + div_term))
             MI_scores[i, j] = MI_scores[j, i] = MI_score
 
@@ -71,8 +70,7 @@ def compute_gc_matrix(corr_coords, num_atoms_per_residue=1):
     # Calculate Mutual Information (MI) scores and Generalized Correlation (GC) matrix
     test_matrix = cov_matrix[:2, :2]
     _, _ = calculate_mi_and_gc(test_matrix, num_atoms_per_residue)
-    MI_scores, GC_matrix = calculate_mi_and_gc(cov_matrix,
-                                               num_atoms_per_residue)
+    MI_scores, GC_matrix = calculate_mi_and_gc(cov_matrix, num_atoms_per_residue)
 
     return MI_scores, GC_matrix
 

@@ -27,7 +27,7 @@ dependencies:
   - scipy
   - tqdm
   - ipython
-  - ipympl 
+  - ipympl
   - pip:
      - -e .  # install git checkout of compass in editable mode
 

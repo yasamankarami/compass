@@ -22,22 +22,33 @@ def prepare_datastructures(arg, first_timer):
     full_topo = mini_traj.topology.to_dataframe()[0]
 
     # Indices of residues in the load trajectory and equivalence
-    resids_to_atoms, resids_to_noh, internal_equiv = get_resids_indices(
-        mini_traj)
+    resids_to_atoms, resids_to_noh, internal_equiv = get_resids_indices(mini_traj)
     raw = {y: x for x in resids_to_atoms for y in resids_to_atoms[x]}
     atoms_to_resids = pydict_to_numbadict(raw)
 
     # Atom selections indices for descriptors calculation
     calphas = get_calpha_p_indices(mini_traj, atoms_to_resids)
     oxy, nitro = get_sb_indices(full_topo, atoms_to_resids)
-    donors, hydros, acceptors = get_dha_indices(mini_traj, arg.heavies,
-                                                atoms_to_resids)
+    donors, hydros, acceptors = get_dha_indices(mini_traj, arg.heavies, atoms_to_resids)
     corr_indices = list(
-        get_calpha_p_indices(mini_traj, atoms_to_resids, numba=False).keys())
+        get_calpha_p_indices(mini_traj, atoms_to_resids, numba=False).keys()
+    )
     prep_time = round(time.time() - first_timer, 2)
-    print(f'Until datastructures prepared: {prep_time} s')
+    print(f"Until datastructures prepared: {prep_time} s")
 
-    return mini_traj, trajs, resids_to_atoms, resids_to_noh, calphas, oxy, nitro, donors, hydros, acceptors, corr_indices
+    return (
+        mini_traj,
+        trajs,
+        resids_to_atoms,
+        resids_to_noh,
+        calphas,
+        oxy,
+        nitro,
+        donors,
+        hydros,
+        acceptors,
+        corr_indices,
+    )
 
 
 def get_xyz_chunks(trajs, topo, chunk_size=500):
@@ -73,11 +84,11 @@ def get_resids_indices(trajectory):
     # Parse the topological information
     df = trajectory.topology.to_dataframe()[0]
 
-    group_by_index = df.groupby(['chainID', 'resSeq', 'segmentID']).indices
+    group_by_index = df.groupby(["chainID", "resSeq", "segmentID"]).indices
     group_by_index_noh = {}
     for key in group_by_index:
         values = group_by_index[key]
-        noh = values[df.loc[values, 'element'] != 'H']
+        noh = values[df.loc[values, "element"] != "H"]
         group_by_index_noh[key] = noh
 
     babel_dict = {i: x for i, x in enumerate(group_by_index)}
@@ -85,8 +96,7 @@ def get_resids_indices(trajectory):
 
     # Transform to numba-dict
     res_ind_zero = {i: group_by_index[x] for i, x in enumerate(group_by_index)}
-    res_ind_noh = {i: group_by_index_noh[x] for i, x in
-                   enumerate(group_by_index_noh)}
+    res_ind_noh = {i: group_by_index_noh[x] for i, x in enumerate(group_by_index_noh)}
 
     res_ind_numba = pydict_to_numbadict(res_ind_zero)
     res_ind_noh_numba = pydict_to_numbadict(res_ind_noh)
@@ -103,7 +113,7 @@ def get_corr_indices(trajectory):
     Returns:
         all_atoms: indices of all atoms to be considered for correlation
     """
-    ca_atoms = trajectory.topology.select('name CA')
+    ca_atoms = trajectory.topology.select("name CA")
 
     dna = "(resname =~ '(5|3)?D([ATGC]){1}(3|5)?$')"
     rna = "(resname =~ '(3|5)?R?([AUGC]){1}(3|5)?$')"
@@ -136,8 +146,10 @@ def get_calpha_p_indices(trajectory, atoms_to_resids, numba=True):
             calphas_p[i] = -1
 
     if len(calphas_p) != num_resids:
-        raise ValueError("\nThe number of calphas + P atoms is different from"
-                         " the number of residues")
+        raise ValueError(
+            "\nThe number of calphas + P atoms is different from"
+            " the number of residues"
+        )
 
     if numba:
         alphas = pydict_to_numbadict(calphas_p)
@@ -160,10 +172,10 @@ def get_sb_indices(topo_df, atoms_to_resids):
 
     """
     # Macro definitions
-    sel_O1 = topo_df.resName.isin(['ASP', 'GLU'])
-    sel_O2 = topo_df.element == 'O'
-    sel_N1 = topo_df.resName.isin(['ARG', 'HIS', 'LYS', 'HSP'])
-    sel_N2 = topo_df.element == 'N'
+    sel_O1 = topo_df.resName.isin(["ASP", "GLU"])
+    sel_O2 = topo_df.element == "O"
+    sel_N1 = topo_df.resName.isin(["ARG", "HIS", "LYS", "HSP"])
+    sel_N2 = topo_df.element == "N"
 
     # Get indices of selected atoms
     o_indices = np.array(topo_df[sel_O1 & sel_O2].index)
@@ -178,8 +190,7 @@ def get_sb_indices(topo_df, atoms_to_resids):
     # Process the nitrogen indices to a numba dict
     nitro_raw1 = defaultdict(list)
     [nitro_raw1[atoms_to_resids[x]].append(x) for x in n_indices]
-    nitro_raw3 = {x: np.asarray(nitro_raw1[x], dtype=np.int32) for x in
-                  nitro_raw1}
+    nitro_raw3 = {x: np.asarray(nitro_raw1[x], dtype=np.int32) for x in nitro_raw1}
     nitro = pydict_to_numbadict(nitro_raw3)
     return oxy, nitro
 
@@ -200,7 +211,7 @@ def get_dha_indices(trajectory, heavies_elements, atoms_to_resids):
     """
     # Get heavies and hydrogen indices
     df, bonds = trajectory.topology.to_dataframe()
-    all_hydrogens = set(df[df.element == 'H'].index)
+    all_hydrogens = set(df[df.element == "H"].index)
 
     a_raw1 = set(np.where(df.element.isin(heavies_elements))[0])
 
@@ -326,15 +337,15 @@ class Mapping:
         input_pdb (str): Path to the input PDB file.
         """
         # Define file paths for the renumbered PDB file and the map file
-        renumbered_pdb_raw = input_pdb.replace('.pdb', '_renumbered.pdb')
+        renumbered_pdb_raw = input_pdb.replace(".pdb", "_renumbered.pdb")
         renumbered_pdb = join(self.out_dir, basename(renumbered_pdb_raw))
-        map_file_raw = input_pdb.replace('.pdb', '_map.txt')
+        map_file_raw = input_pdb.replace(".pdb", "_map.txt")
         map_file = join(self.out_dir, basename(map_file_raw))
 
         # Open input PDB file for reading, renumbered PDB file and map file for writing
-        with open(input_pdb, 'r') as infile, open(renumbered_pdb,
-                                                  'w') as outfile, open(
-            map_file, 'w') as mapfile:
+        with open(input_pdb, "r") as infile, open(renumbered_pdb, "w") as outfile, open(
+            map_file, "w"
+        ) as mapfile:
             # Initialize variables for residue renumbering and mapping
             current_residue_number = 0
             residue_map = {}
@@ -354,21 +365,25 @@ class Mapping:
                         current_residue_number += 1
                         last_residue_id = residue_id
                         residue_map[(chain_id, old_residue_number)] = (
-                            current_residue_number, 'A')
+                            current_residue_number,
+                            "A",
+                        )
 
                     # Write renumbered line with new chain ID 'A'
-                    new_line = line[:21] + 'A' + str(
-                        current_residue_number).rjust(4) + line[26:]
+                    new_line = (
+                        line[:21]
+                        + "A"
+                        + str(current_residue_number).rjust(4)
+                        + line[26:]
+                    )
                     outfile.write(new_line)
                 else:
                     # Write non-ATOM/HETATM lines as they are
                     outfile.write(line)
 
             # Write the residue map to the map file
-            for (chain_id, old_number), (
-                    new_number, new_chain) in residue_map.items():
-                mapfile.write(
-                    f"{chain_id} {old_number} {new_chain} {new_number}\n")
+            for (chain_id, old_number), (new_number, new_chain) in residue_map.items():
+                mapfile.write(f"{chain_id} {old_number} {new_chain} {new_number}\n")
 
         # Print confirmation messages
         # print(f"Renumbered PDB file saved as: {renumbered_pdb}")
@@ -384,34 +399,31 @@ class Mapping:
         renumbered_pdb (str): Path to the renumbered PDB file.
         """
         # Define file path for the restored PDB file
-        original_pdb = renumbered_pdb.replace('_renumbered.pdb',
-                                              '_restored.pdb')
+        original_pdb = renumbered_pdb.replace("_renumbered.pdb", "_restored.pdb")
 
         # Initialize a dictionary to store the residue mapping information
         residue_map = {}
 
         # Read the map file and populate the residue mapping dictionary
-        with open(map_file, 'r') as mapfile:
+        with open(map_file, "r") as mapfile:
             for line in mapfile:
                 original_chain, old_number, new_chain, new_number = line.split()
-                residue_map[(new_chain, new_number)] = (
-                    original_chain, old_number)
+                residue_map[(new_chain, new_number)] = (original_chain, old_number)
 
         # Open renumbered PDB file for reading and restored PDB file for writing
-        with open(renumbered_pdb, 'r') as infile, open(original_pdb,
-                                                       'w') as outfile:
+        with open(renumbered_pdb, "r") as infile, open(original_pdb, "w") as outfile:
             # Loop through each line in the renumbered PDB file
             for line in infile:
                 if line.startswith(("ATOM", "HETATM")):
                     # Extract new chain ID and new residue number
                     new_chain = line[21]
                     new_number = line[22:26].strip()
-                    original_chain, old_number = residue_map[
-                        (new_chain, new_number)]
+                    original_chain, old_number = residue_map[(new_chain, new_number)]
 
                     # Write restored line with original chain ID and residue number
-                    new_line = line[:21] + original_chain + old_number.rjust(
-                        4) + line[26:]
+                    new_line = (
+                        line[:21] + original_chain + old_number.rjust(4) + line[26:]
+                    )
                     outfile.write(new_line)
                 else:
                     # Write non-ATOM/HETATM lines as they are

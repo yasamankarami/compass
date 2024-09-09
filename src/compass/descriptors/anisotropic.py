@@ -1,12 +1,11 @@
 # Created by gonzalezroy at 6/28/24
 import time
 
+import config as cfg
 import mdtraj as md
 import numpy as np
-from numba import njit, prange
-
-import config as cfg
 import topo_traj as tt
+from numba import njit, prange
 
 
 @njit(parallel=True, fastmath=True)
@@ -85,7 +84,7 @@ def get_locators(n_res, n_coords):
 time_here = time.time()
 
 # Load trajectory
-config_path = '/home/gonzalezroy/RoyHub/Code_pronucompass/example/params.cfg'
+config_path = "/home/gonzalezroy/RoyHub/Code_pronucompass/example/params.cfg"
 arg, dict_arg = cfg.parse_params(config_path)
 full_traj = md.load(arg.traj, top=arg.topo)
 
@@ -114,25 +113,26 @@ locators = tt.pydict_to_numbadict(get_locators(num_res, num_coords))
 C_i = calc_c_i(num_res, num_frames, locators, R)
 _, _ = calc_gc(2, 2, locators, R[:2, :2], C_i)
 MI, GC = calc_gc(num_res, num_frames, locators, R, C_i)
-print(f'Time elapsed: {time.time() - time_here:.2f} s')
+print(f"Time elapsed: {time.time() - time_here:.2f} s")
 # fill lower triangle of symmetric GC
 
 GC[np.tril_indices(num_res)] = GC.T[np.tril_indices(num_res)]
 
 import correlations as corr
 
-corr.plot_matrix(GC, 'GC')
+corr.plot_matrix(GC, "GC")
+
+from collections import Counter
 
 # =============================================================================
 #
 # =============================================================================
 import hdbscan
-from collections import Counter
 import matplotlib.pyplot as plt
 
-clusterer = hdbscan.HDBSCAN(min_cluster_size=5,
-                            gen_min_span_tree=True,
-                            approx_min_span_tree=False)
+clusterer = hdbscan.HDBSCAN(
+    min_cluster_size=5, gen_min_span_tree=True, approx_min_span_tree=False
+)
 clusterer.fit(GC.astype(np.float64))
 clusterer.labels_.max()
 
@@ -146,13 +146,14 @@ counts = Counter(clusters).most_common()
 
 for x in counts:
     print(x)
-    print('residue ' + ' '.join(
-        [str(x) for x in np.where(clusterer.labels_ == x[0])[0]]))
+    print(
+        "residue " + " ".join([str(x) for x in np.where(clusterer.labels_ == x[0])[0]])
+    )
 
 clusterer.condensed_tree_.plot(select_clusters=True)
-plt.savefig('condensed_tree.png')
+plt.savefig("condensed_tree.png")
 plt.close()
 
 clusterer.minimum_spanning_tree_.plot()
-plt.savefig('minimum_spanning_tree.png')
+plt.savefig("minimum_spanning_tree.png")
 plt.close()

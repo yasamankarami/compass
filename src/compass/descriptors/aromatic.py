@@ -1,13 +1,12 @@
 # Created by gonzalezroy at 7/27/24
 from collections import defaultdict
 
+import config as cfg
 import mdtraj as md
 import networkx as nx
 import numpy as np
-from numba.typed import List
-
-import config as cfg
 import topo_traj as tt
+from numba.typed import List
 
 
 def get_cycles(bonds):
@@ -84,15 +83,13 @@ def is_planar_cycle(cycle, coordinates, tolerance=10):
         coords3 = coordinates[cycle[(i + 2) % num_atoms]]
         coords4 = coordinates[cycle[(i + 3) % num_atoms]]
 
-        dihedral_angle = calculate_dihedral_angle(coords1, coords2, coords3,
-                                                  coords4)
-        if abs(dihedral_angle) > tolerance and abs(
-                dihedral_angle - 180) > tolerance:
+        dihedral_angle = calculate_dihedral_angle(coords1, coords2, coords3, coords4)
+        if abs(dihedral_angle) > tolerance and abs(dihedral_angle - 180) > tolerance:
             return False
     return True
 
 
-config_path = '/home/gonzalezroy/RoyHub/Code_pronucompass/example/params.cfg'
+config_path = "/home/gonzalezroy/RoyHub/Code_pronucompass/example/params.cfg"
 arg, dict_arg = cfg.parse_params(config_path)
 
 # Load trajectory
@@ -101,8 +98,7 @@ mini_traj = next(md.iterload(trajs[0], top=arg.topo, chunk=1))
 full_topo = mini_traj.topology.to_dataframe()[0]
 
 # Indices of residues in the load trajectory and equivalence
-resids_to_atoms, resids_to_noh, internal_equiv = \
-    tt.get_resids_indices(mini_traj)
+resids_to_atoms, resids_to_noh, internal_equiv = tt.get_resids_indices(mini_traj)
 raw = {y: x for x in resids_to_atoms for y in resids_to_atoms[x]}
 atoms_to_resids = tt.pydict_to_numbadict(raw)
 
@@ -110,8 +106,9 @@ atoms_to_resids = tt.pydict_to_numbadict(raw)
 bonds = mini_traj.topology.bonds
 cycles_raw = get_cycles(bonds)
 coordinates = mini_traj.xyz[0] * 10  # Convert nm to Angstroms
-cycles = [cycle for cycle in cycles_raw if
-          is_planar_cycle(cycle, coordinates, tolerance=15)]
+cycles = [
+    cycle for cycle in cycles_raw if is_planar_cycle(cycle, coordinates, tolerance=15)
+]
 
 resids_to_rings_raw = defaultdict(List)
 for cycle in cycles:
@@ -177,7 +174,8 @@ def detect_stacking(rings):
 
             # Determine if stacking interaction exists
             if center_dist < 5.0 and (
-                    abs(angle_degrees) < 30 or abs(angle_degrees - 180) < 30):
+                abs(angle_degrees) < 30 or abs(angle_degrees - 180) < 30
+            ):
                 interactions.append((i, j))
 
     return interactions
