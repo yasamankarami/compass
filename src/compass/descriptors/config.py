@@ -4,7 +4,8 @@ import os
 from argparse import Namespace
 
 allowed_params = {
-    "generals": {"topology", "trajectory", "output_dir", "n_cores", "job_name"},
+    "generals": {"topology", "trajectory", "output_dir", "n_cores",
+                 "job_name"},
     "non_bond": {"non_bond_cut"},
     "salt_bridges": {"NO_cut"},
     "hbonds": {"DA_cut", "HA_cut", "DHA_cut", "heavy"},
@@ -23,9 +24,10 @@ def read_config_file(config_path):
     Returns:
         config_obj: configparser read object
     """
-    config_obj = configparser.ConfigParser(
-        allow_no_value=True, inline_comment_prefixes="#"
-    )
+    if not os.path.exists(config_path):
+        raise FileNotFoundError(f"Configuration file not found: {config_path}")
+    config_obj = configparser.ConfigParser(allow_no_value=True,
+                                           inline_comment_prefixes="#")
     config_obj.optionxform = str
     config_obj.read(config_path)
     return config_obj
@@ -107,5 +109,12 @@ def parse_params(config_path):
             f"{allowed_heavies} as heavy atoms (donor or acceptor)."
         )
 
-    os.makedirs(param_space.out_dir, exist_ok=True)
+    # Check path existence
+    if not os.path.exists(param_space.topo):
+        raise FileNotFoundError(f"Topology file not found: {param_space.topo}")
+    if not os.path.exists(param_space.traj):
+        raise FileNotFoundError(f"Trajectory file not found: {param_space.traj}")
+    if not os.path.exists(param_space.out_dir):
+        os.makedirs(param_space.out_dir, exist_ok=True)
+
     return param_space, param_dict

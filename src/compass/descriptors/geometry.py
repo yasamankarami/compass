@@ -6,7 +6,7 @@ import time
 from os.path import join
 
 import numpy as np
-import pronucompass.descriptors.topo_traj as tt
+import compass.descriptors.topo_traj as tt
 import seaborn as sns
 from matplotlib import pyplot as plt
 from numba import njit

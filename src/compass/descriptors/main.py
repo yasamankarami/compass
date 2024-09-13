@@ -5,9 +5,9 @@ Functions related to the calculation of geometric descriptor matrices
 import time
 
 import numpy as np
-import pronucompass.descriptors.correlations as corr
-import pronucompass.descriptors.geometry as geom
-import pronucompass.descriptors.topo_traj as tt
+import compass.descriptors.correlations as corr
+import compass.descriptors.geometry as geom
+import compass.descriptors.topo_traj as tt
 from numba import njit, prange
 
 # todo: update the docstrings
