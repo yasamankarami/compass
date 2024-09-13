@@ -11,12 +11,12 @@ Run the computation of descriptors
 # todo: noH by default in the min dist calculation
 
 import time
-
-import pronucompass.descriptors.config as cfg
-import pronucompass.descriptors.geometry as geom
-import pronucompass.descriptors.main as mm
-import pronucompass.descriptors.pca as pca
-import pronucompass.descriptors.topo_traj as tt
+import sys
+import compass.descriptors.config as cfg
+import compass.descriptors.geometry as geom
+import compass.descriptors.main as mm
+import compass.descriptors.pca as pca
+import compass.descriptors.topo_traj as tt
 
 
 def runner():
@@ -28,65 +28,32 @@ def runner():
     # 1. Prelude
     # =============================================================================
     # ==== Parse configuration file
-    # if len(sys.argv) != 2:
-    #     raise ValueError(
-    #         '\ncompass syntax is: compass path-to-config-file')
-    # config_path = sys.argv[1]
-    config_path = "/home/gonzalezroy/RoyHub/Code_pronucompass/example/params.cfg"
+    if len(sys.argv) != 2:
+        raise ValueError(
+            '\ncompass syntax is: compass path-to-config-file')
+    config_path = sys.argv[1]
+    # config_path = "./example/params.cfg"
     arg, dict_arg = cfg.parse_params(config_path)
 
     # ==== Prepare datastructures & containers
-    (
-        mini_traj,
-        trajs,
-        resids_to_atoms,
-        resids_to_noh,
-        calphas,
-        oxy,
-        nitro,
-        donors,
-        hydros,
-        acceptors,
-        corr_indices,
-    ) = tt.prepare_datastructures(arg, first_timer)
+    (mini_traj, trajs, resids_to_atoms, resids_to_noh, calphas, oxy, nitro,
+     donors, hydros, acceptors, corr_indices) = tt.prepare_datastructures(
+        arg, first_timer)
 
     # =============================================================================
     # 2. Computing
     # =============================================================================
     ave_min_dist, occ_nb, cp, occ_sb, occ_hb, occ_int, mi, gc = mm.compute_descriptors(
-        mini_traj,
-        trajs,
-        arg,
-        resids_to_atoms,
-        resids_to_noh,
-        calphas,
-        oxy,
-        nitro,
-        donors,
-        hydros,
-        acceptors,
-        corr_indices,
-        first_timer,
-    )
+        mini_traj, trajs, arg, resids_to_atoms, resids_to_noh, calphas, oxy,
+        nitro, donors, hydros, acceptors, corr_indices, first_timer)
 
     # =============================================================================
     # 3. Saving matrices
     # =============================================================================
     n = len(resids_to_atoms)
-    matrices = geom.process_matrices(
-        arg,
-        n,
-        calphas,
-        ave_min_dist,
-        occ_nb,
-        cp,
-        occ_sb,
-        occ_hb,
-        occ_int,
-        mi,
-        gc,
-        first_timer,
-    )
+    matrices = geom.process_matrices(arg, n, calphas, ave_min_dist, occ_nb, cp,
+                                     occ_sb, occ_hb, occ_int, mi, gc,
+                                     first_timer)
 
     # =============================================================================
     # 4. Perform PCA & generate adjacency matrix from PCA results
