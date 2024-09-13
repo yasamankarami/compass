@@ -8,7 +8,6 @@ dependencies:
   - python>=3.8
   - pip
   - tbb
-  - numba_kdtree
   - numba~=0.59.1
   - numpy~=1.26.4
   - pandas~=2.2.2
@@ -30,14 +29,12 @@ dependencies:
   - ipympl
   - pip:
      - -e .  # install git checkout of compass in editable mode
-
-  # DEVELOPMENT ONLY PACKAGES (could also be kept in a separate environment file)
-  - jupyterlab
-  - pytest
-  - pytest-cov
-  - tox
-  - pre_commit
-  - nbdime
-  - nbstripout
-  - sphinx
-  - recommonmark
+     - numba-kdtree
+     - jupyterlab
+     - pytest
+     - pytest-cov
+     - tox
+     - nbdime
+     - nbstripout
+     - sphinx
+     - recommonmark
