@@ -259,12 +259,14 @@ def process_matrices(
     }
 
     # Process matrices
+    matrices_name = {}
     for matrix in matrices:
         data = matrices[matrix]["data"]
         miss_list = matrices[matrix]["miss"]
         normalize = matrices[matrix]["norm"]
         precision = matrices[matrix]["prec"]
         matrix_name = get_matrix_name(arg.out_dir, arg.title, matrix)
+        matrices_name.update({matrix: matrix_name})
         matrix_data = save_matrix(
             data, n, miss_list, matrix_name, norm=normalize, prec=precision
         )
@@ -273,7 +275,7 @@ def process_matrices(
 
     saving_time = round(time.time() - first_timer, 2)
     print(f"Until saving & plotting matrices: {saving_time} s")
-    return matrices
+    return matrices, matrices_name
 
 
 #
