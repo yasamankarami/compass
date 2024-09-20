@@ -1,10 +1,13 @@
 # Created by gonzalezroy at 6/26/24
+import time
 
 import numpy as np
 from numba import njit, prange
 from numpy import concatenate as concat
 from scipy.sparse import lil_matrix
 from sklearn.decomposition import PCA
+
+from compass.descriptors import geometry as geom
 
 
 def reshape_matrices(matrices):
@@ -97,6 +100,39 @@ def calc_chunk_distances(chunk_i, chunk_j, threshold):
                 distances[x, y] = dist
     return distances
 
+
+def run_pca(arg, matrices, n, first_timer):
+    """
+    Perform PCA on the selected matrices
+
+    Args:
+        arg: namespace with the arguments
+        matrices: list of matrices to be used in the PCA
+        n: number of residues
+        first_timer: initial time for time tracking
+    """
+    # Select the matrices to be used in the PCA
+    gc_mat = matrices["GC"]["data"]
+    int_mat = matrices["INTERACTIONS"]["data"]
+    cp_mat = matrices["COMMPROP"]["data"]
+    dist_mat = matrices["MINDIST"]["data"]
+    matrices = [gc_mat, int_mat, cp_mat, dist_mat]
+    data = reshape_matrices(matrices)
+    del matrices
+
+    # Perform PCA & generate adjacency matrix
+    pca_result = perform_pca(data)
+    del data
+    adj_mat_raw = calc_adjacency_matrix(pca_result)
+    adj_mat = adj_mat_raw.toarray()
+    del adj_mat_raw
+    adj_name = geom.get_matrix_name(arg.out_dir, arg.title, "ADJACENCY")
+    adj_mat = geom.save_matrix(adj_mat, n, adj_name, norm=True, prec=4)
+    geom.plot_matrix(adj_mat, adj_name.replace(".mat", ".png"))
+
+    pca_time = round(time.time() - first_timer, 2)
+    print(f"Until PCA & Adjacency matrix computing: {pca_time} s")
+    return adj_name
 
 # =============================================================================
 # Debugging area
