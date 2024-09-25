@@ -113,8 +113,9 @@ def parse_params(config_path):
     # Check path existence
     if not os.path.exists(param_space.topo):
         raise FileNotFoundError(f"Topology file not found: {param_space.topo}")
-    if not os.path.exists(param_space.traj):
-        raise FileNotFoundError(f"Trajectory file not found: {param_space.traj}")
+    for x in param_space.traj.split():
+        if not os.path.exists(x):
+            raise FileNotFoundError(f"Trajectory file not found: {x}")
     if not os.path.exists(param_space.out_dir):
         os.makedirs(param_space.out_dir, exist_ok=True)
 

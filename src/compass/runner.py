@@ -36,7 +36,7 @@ def runner():
         raise ValueError(
             '\ncompass syntax is: compass path-to-config-file')
     config_path = sys.argv[1]
-    # config_path = "./example/params.cfg"
+    # config_path = "./example/error1.cfg"
     first_timer = time.time()
     arg, dict_arg = cfg.parse_params(config_path)
 
