@@ -2,15 +2,78 @@
 """Manage common operations as well as those related to topo and traj files"""
 import time
 from collections import defaultdict
-from os.path import basename, join
+from os.path import basename, join, split
 
 import mdtraj as md
 import numpy as np
+import prody as prd
 from numba import njit
 from numba.typed.typeddict import Dict
 
 
+def remap_toppology(topo, mini_traj, out_dir):
+    """
+    Remap the topology of a system to start from residue 1 and chain 'A'
+
+    Outputs:
+        topo_pdb_name: the renumbered topology in pdb format
+        remap_name: the mapping between the original and renumbered residues
+        renum_pdb: the renumbered pdb file
+    """
+
+    # Save original topology as pdb
+    topo_basename = split(topo)[-1].split('.')[0]
+    topo_pdb_name = join(out_dir, topo_basename + '_orig.pdb')
+    mini_traj.save_pdb(topo_pdb_name)
+
+    # Original info
+    parsed = prd.parsePDB(topo_pdb_name)
+    nums = parsed.getResnums()
+    chains = parsed.getChids()
+    segs = [f'"{x}"' if x in {"", ''} else x for x in parsed.getSegnames()]
+    orig = sorted(set(zip(nums, chains, segs)), key=lambda x: int(x[0]))
+
+    # After-mapping info
+    new_nums = list(range(1, len(orig) + 1))
+    parsed.setChids('A')
+    new_chains = parsed.getChids()
+    new_segs = [f'"{x}"' if x in {"", ''} else x for x in parsed.getSegnames()]
+    renum = sorted(set(zip(new_nums, new_chains, new_segs)),
+                   key=lambda x: int(x[0]))
+
+    # Output the re-mapping
+    remap_name = join(out_dir, topo_basename + '_mapping.txt')
+    with open(remap_name, 'w') as f:
+        for o, r in zip(orig, renum):
+            line = f'{o[0]:>6} {o[1]:>2} {o[2]:>4}  {r[0]:>6} {r[1]:>2} {r[2]:>4}\n'
+            f.write(line)
+
+    # Output renumbered pdb
+    renum_pdb = topo_pdb_name.replace('_orig.pdb', '_renum.pdb')
+    prd.writePDB(renum_pdb, parsed)
+
+
 def prepare_datastructures(arg, first_timer):
+    """
+    Prepare datastructures for the calculation of descriptors
+
+    Args:
+        arg: namespace with the arguments
+        first_timer: first timer to measure the time
+
+    Returns:
+        mini_traj: the first chunk of the trajectory
+        trajs: list of trajectories
+        resids_to_atoms: numba Dict of each residue's indices
+        resids_to_noh: numba Dict of each residue's indices without hydrogens
+        calphas: numba Dict of each residue's C-alpha indices
+        oxy: numba Dict of each residue's oxygen indices
+        nitro: numba Dict of each residue's nitrogen indices
+        donors: numba Dict of each residue's donor indices
+        hydros: numba Dict of each residue's hydrogen indices
+        acceptors: numba Dict of each residue's acceptor indices
+        corr_indices: list of indices of atoms to be considered for correlation
+    """
     # Produce mapping files
     # mapping = Mapping(arg.out_dir)
     # map_file, renumbered_pdb = mapping.pre_processing(arg.topo)
@@ -20,6 +83,9 @@ def prepare_datastructures(arg, first_timer):
     trajs = arg.traj.split()
     mini_traj = next(md.iterload(trajs[0], top=arg.topo, chunk=1))
     full_topo = mini_traj.topology.to_dataframe()[0]
+
+    # Produce mapping files
+    remap_toppology(arg.topo, mini_traj, arg.out_dir)
 
     # Indices of residues in the load trajectory and equivalence
     resids_to_atoms, resids_to_noh, internal_equiv = \
@@ -427,3 +493,14 @@ class Mapping:
 
         # Print confirmation message
         # print(f"Restored PDB file saved as: {original_pdb}")
+
+# =============================================================================
+#
+# =============================================================================
+# import mdtraj as md
+# import prody as prd
+#
+# load topology and trajectory
+# topo = '/home/rglez/RoyHub/compass/data/MDs/nucleosome_full_2c/1kx5_dry.pdb'
+# traj = '/home/rglez/RoyHub/compass/data/MDs/nucleosome_full_2c/nuc-prot-trim.dcd'
+# out_dir = '/home/rglez/RoyHub/compass/data/outputs/nucleosome_full_2c'

@@ -3,6 +3,7 @@
 Run the computation of descriptors
 """
 # done: change P atoms as NA equivalents to Calpha -> C5'
+# done: noH by default in the min dist calculation
 
 # todo: create a hierarchy for outputs
 # todo: chunkify processing
@@ -10,7 +11,6 @@ Run the computation of descriptors
 # todo: multiply by 10 the coordinates to convert nm to Angstroms
 
 # todo: superpose trajectory to the first frame using Calpha atoms for GC
-# todo: noH by default in the min dist calculation
 # todo: remove the Debugging Area
 #%%
 import sys
