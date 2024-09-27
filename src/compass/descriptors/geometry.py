@@ -280,6 +280,7 @@ def process_matrices(arg, n, calphas, ave_min_dist, occ_nb, cp, occ_sb, occ_hb,
 
 #
 # # todo: specify correct diagonal filling behaviour
+# # todo: correct the titles of the graph
 #
 # no_miss = []
 # cp_miss = [i for i, x in enumerate(calphas) if calphas[x] == -1]

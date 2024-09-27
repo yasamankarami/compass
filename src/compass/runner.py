@@ -73,13 +73,13 @@ def runner():
     # =========================================================================
 
     # # Construct graphs
-    # arg.adjacency_file = adj_name
-    # arg.min_dist_matrix_file = matrices_names["MINDIST"]
-    # arg.pdb_file_path = dict_arg["generals"]["topology"]
-    # arg.results_dir = dict_arg["generals"]["output_dir"]
-    # gn.process_graphs(arg)
-    # print(
-    #     f'\nUntil graphs construction: {round(time.time() - first_timer, 2)} s')
+    arg.adjacency_file = adj_name
+    arg.min_dist_matrix_file = matrices_names["MINDIST"]
+    arg.pdb_file_path = dict_arg["generals"]["topology"]
+    arg.results_dir = dict_arg["generals"]["output_dir"]
+    gn.process_graphs(arg)
+    print(
+        f'\nUntil graphs construction: {round(time.time() - first_timer, 2)} s')
     #
     # # Compute network parameters
     # results_dir = join(arg.results_dir, 'network')
