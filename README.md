@@ -3,11 +3,11 @@
 > Understanding Communication Networks in MD of Protein-NA Complexes 
 
 
-"compass" is a user-friendly Python package that ... For a comprehensive introduction, please refer to the following [paper]().
+**compass** is a user-friendly Python package that ... For a comprehensive introduction, please refer to the following [paper]().
 
 
 ## Installation
-The installation of "compass" is straightforward. Just type the following commands in your terminal (assuming you've got Anaconda or Miniconda up and running):
+The installation of **compass** is straightforward. Just type the following commands in your terminal (assuming you've got Anaconda or Miniconda up and running):
 
 ```bash
    git clone https://github.com/rglez/compass.git
@@ -17,7 +17,7 @@ The installation of "compass" is straightforward. Just type the following comman
 ````
    
 ## Basic usage
-"compass" is a command-line tool that requires only the path to a well-structured configuration file (refer to the documentation for instructions on preparing it). You can run it using the following command:
+**compass** is a command-line tool that requires only the path to a well-structured configuration file (refer to the documentation for instructions on preparing it). You can run it using the following command:
 
 ```bash
    compass path-to-config-file.cfg
@@ -38,7 +38,7 @@ This project is licensed under the MIT License. For more details, check the [LIC
 
 ## Citing compass
 
-As academic researchers, we depend on citations to justify the time spent developing software. If you use "compass" in your research,  give us a pat on the back by citing the following paper:
+As academic researchers, we depend on citations to justify the time spent developing software. If you use **compass** in your research,  give us a pat on the back by citing the following paper:
 
 ```
 (soon available)
