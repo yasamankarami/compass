@@ -28,11 +28,11 @@ The installation of **compass** is straightforward. Just type the following comm
 For comprehensive documentation and tutorials, visit [the wiki](../../wiki).
 
 ## Contributing
-If you are interested in contributing to the project, please review the guidelines in the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+If you are interested in contributing to the project, please review the guidelines in the [CONTRIBUTING.rst](CONTRIBUTING.rst) file.
 
 
 ## License
-This project is licensed under the MIT License. For more details, check the [LICENSE](LICENSE) file.
+This project is licensed under the MIT License. For more details, check the [LICENSE](LICENSE.txt) file.
 
 
 ## Citing compass
