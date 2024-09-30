@@ -251,8 +251,8 @@ def process_matrices(arg, n, calphas, ave_min_dist, occ_nb, cp, occ_sb, occ_hb,
         "INTERACTIONS": {"data": occ_int, "norm": False,
                          "prec": 2},
         "COMMPROP": {"data": cp, "norm": True, "prec": 4},
-        "MI": {"data": mi, "norm": False, "prec": 4},
-        "GC": {"data": gc, "norm": False, "prec": 4},
+        "MI": {"data": mi, "norm": True, "prec": 4},
+        "GC": {"data": gc, "norm": True, "prec": 4},
     }
 
     # Process matrices
