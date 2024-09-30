@@ -49,7 +49,7 @@ def process_graphs(param_space, distance_cutoffs=None):
 
         # Define file names based on the distance cutoff
         graph_filename = f"graph_cutoff_{distance_cutoff}.json"
-        output_graph_file = os.path.join(param_space.results_dir,
+        output_graph_file = os.path.join(param_space.network_dir,
                                          graph_filename)
 
         # Save the graph and atom mapping
@@ -57,7 +57,7 @@ def process_graphs(param_space, distance_cutoffs=None):
                                                  output_file=output_graph_file)
 
         # Plot and save histogram
-        output_file_prefix = os.path.join(param_space.results_dir,
+        output_file_prefix = os.path.join(param_space.network_dir,
                                           f"graph_cutoff_{distance_cutoff}")
         graph_constructor.plot_and_save_histogram(G,
                                                   output_file_prefix=output_file_prefix)

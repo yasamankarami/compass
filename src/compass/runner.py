@@ -4,17 +4,12 @@ Run the computation of descriptors
 """
 # done: change P atoms as NA equivalents to Calpha -> C5'
 # done: noH by default in the min dist calculation
-
-# todo: create a hierarchy for outputs
-# todo: chunkify processing
-# todo: integrate the ability to load replicas
-# todo: multiply by 10 the coordinates to convert nm to Angstroms
-
-# todo: superpose trajectory to the first frame using Calpha atoms for GC
 # todo: remove the Debugging Area
-#%%
+# %%
+import os
 import sys
 import time
+from os.path import join
 
 import compass.descriptors.config as cfg
 import compass.descriptors.geometry as geom
@@ -22,7 +17,9 @@ import compass.descriptors.main as mm
 import compass.descriptors.pca as pca
 import compass.descriptors.topo_traj as tt
 import compass.network.generals as gn
-#%%
+
+
+# %%
 
 def runner():
     """
@@ -36,7 +33,7 @@ def runner():
         raise ValueError(
             '\ncompass syntax is: compass path-to-config-file')
     config_path = sys.argv[1]
-    # config_path = "./example/error1.cfg"
+    # config_path = "/home/rglez/RoyHub/compass/example/params.cfg"
     first_timer = time.time()
     arg, dict_arg = cfg.parse_params(config_path)
 
@@ -72,38 +69,38 @@ def runner():
     # 5. Perform network analyses
     # =========================================================================
 
-    # # Construct graphs
-    # arg.adjacency_file = adj_name
-    # arg.min_dist_matrix_file = matrices_names["MINDIST"]
-    # arg.pdb_file_path = dict_arg["generals"]["topology"]
-    # arg.results_dir = dict_arg["generals"]["output_dir"]
-    # gn.process_graphs(arg)
-    # print(
-    #     f'\nUntil graphs construction: {round(time.time() - first_timer, 2)} s')
-    #
-    # # Compute network parameters
-    # results_dir = join(arg.results_dir, 'network')
-    # gn.process_graph_files(results_dir)
-    # # Find alternative paths for a specific graph
-    # # graph, atom_mapping = rf.ReadFiles().load_graph_and_mapping('path_to_graph_file.json')
-    # # alternative_paths = network_parameters.find_alternative_paths(graph, atom_mapping, 'source_residue', 'target_residue')
-    # print(
-    #     f'Until network parameters computed: {round(time.time() - first_timer, 2)} s')
-    #
-    # # Compute communities and cliques
-    # # method = input("Select community detection method ('leiden' or 'girvan'): ").strip().lower()
-    # method = 'leiden'
-    # gn.process_graph_files_for_communities_and_cliques(results_dir, method)
-    # print(
-    #     f'Until communities and cliques detection: {round(time.time() - first_timer, 2)} s')
-    #
-    # # =============================================================================
-    # # 6. Generate PyMOL scripts
-    # # =============================================================================1
-    # gn.generate_pymol_scripts(results_dir, arg.pdb_file_path)
-    # print(
-    #     f'Until pymol scripts generation: {round(time.time() - first_timer, 2)} s')
-    # print(f"Normal Termination")
+    # Construct graphs
+    arg.adjacency_file = adj_name
+    arg.min_dist_matrix_file = matrices_names["MINDIST"]
+    arg.pdb_file_path = dict_arg["generals"]["topology"]
+    arg.network_dir = join(dict_arg["generals"]["output_dir"], 'network')
+    os.makedirs(arg.network_dir, exist_ok=True)
+    gn.process_graphs(arg)
+    print(
+        f'\nUntil graphs construction: {round(time.time() - first_timer, 2)} s')
+
+    # Compute network parameters
+    gn.process_graph_files(arg.network_dir)
+    # Find alternative paths for a specific graph
+    # graph, atom_mapping = rf.ReadFiles().load_graph_and_mapping('path_to_graph_file.json')
+    # alternative_paths = network_parameters.find_alternative_paths(graph, atom_mapping, 'source_residue', 'target_residue')
+    print(
+        f'Until network parameters computed: {round(time.time() - first_timer, 2)} s')
+
+    # Compute communities and cliques
+    # method = input("Select community detection method ('leiden' or 'girvan'): ").strip().lower()
+    method = 'leiden'
+    gn.process_graph_files_for_communities_and_cliques(arg.network_dir, method)
+    print(
+        f'Until communities and cliques detection: {round(time.time() - first_timer, 2)} s')
+
+    # =============================================================================
+    # 6. Generate PyMOL scripts
+    # =============================================================================1
+    gn.generate_pymol_scripts(arg.network_dir, arg.pdb_file_path)
+    print(
+        f'Until pymol scripts generation: {round(time.time() - first_timer, 2)} s')
+    print(f"Normal Termination")
 
 # =============================================================================
 # Debugging Area (to be removed)

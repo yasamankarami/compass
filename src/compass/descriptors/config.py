@@ -9,7 +9,6 @@ allowed_params = {
     "non_bond": {"non_bond_cut"},
     "salt_bridges": {"NO_cut"},
     "hbonds": {"DA_cut", "HA_cut", "DHA_cut", "heavy"},
-    "network": {"mindist_matrix", "adjacency_matrix"},
 }
 
 allowed_heavies = {"S", "N", "O"}
