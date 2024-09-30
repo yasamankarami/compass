@@ -25,8 +25,7 @@ The installation of **compass** is straightforward. Just type the following comm
 
 ## Documentation
 
-For comprehensive documentation and tutorials, visit [compass.readthedocs.io]().
-
+For comprehensive documentation and tutorials, visit [the wiki](../../wiki).
 
 ## Contributing
 If you are interested in contributing to the project, please review the guidelines in the [CONTRIBUTING.md](CONTRIBUTING.md) file.
