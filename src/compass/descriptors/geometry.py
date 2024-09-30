@@ -215,21 +215,21 @@ def get_matrix_name(out_dir, title, suffix):
     matrix_dir = join(out_dir, "matrices")
     if not os.path.exists(matrix_dir):
         os.makedirs(matrix_dir, exist_ok=True)
-    return join(out_dir, 'matrices',f"{title}_{suffix}.mat")
+    return join(out_dir, 'matrices', f"{title}_{suffix}.mat")
 
 
-def plot_matrix(matrix, output_name):
+def plot_matrix(matrix, matrix_title, output_name):
     """
     Plot the Generalized Correlation matrix.
 
     Args:
         matrix: Generalized Correlation matrix
+        matrix_title: title of the matrix
         output_name: output name for the plot
     """
     plt.figure(figsize=(10, 8))
-    ax = sns.heatmap(matrix, cmap="jet",
-                     cbar_kws={"label": "Covariance Value"})
-    plt.title("Generalized Correlation Matrix Heatmap")
+    ax = sns.heatmap(matrix, cmap="jet")
+    plt.title(matrix_title)
     plt.xlabel("Residue Index")
     plt.ylabel("Residue Index")
     plt.savefig(output_name)
@@ -244,15 +244,28 @@ def process_matrices(arg, n, calphas, ave_min_dist, occ_nb, cp, occ_sb, occ_hb,
     # Declare matrices to process
     matrices = {
         "MINDIST": {"data": ave_min_dist, "norm": False,
-                    "prec": 4},
-        "NONBOND": {"data": occ_nb, "norm": False, "prec": 4},
-        "SALTBRIDGES": {"data": occ_sb, "norm": False, "prec": 4},
-        "HBONDS": {"data": occ_hb, "norm": False, "prec": 4},
-        "INTERACTIONS": {"data": occ_int, "norm": False,
-                         "prec": 2},
-        "COMMPROP": {"data": cp, "norm": True, "prec": 4},
-        "MI": {"data": mi, "norm": True, "prec": 4},
-        "GC": {"data": gc, "norm": True, "prec": 4},
+                    "prec": 4, "title": "Pairwise Minimum Distances"},
+
+        "NONBOND": {"data": occ_nb, "norm": False, "prec": 4,
+                    "title": "Non-Bonded Interactions"},
+
+        "SALTBRIDGES": {"data": occ_sb, "norm": False, "prec": 4,
+                        "title": "Salt Bridges"},
+
+        "HBONDS": {"data": occ_hb, "norm": False, "prec": 4,
+                   "title": "Hydrogen Bonds"},
+
+        "INTERACTIONS": {"data": occ_int, "norm": False, "prec": 2,
+                         "title": "Interactions"},
+
+        "COMMPROP": {"data": cp, "norm": True, "prec": 4,
+                     "title": "Communication Properties"},
+
+        "MI": {"data": mi, "norm": True, "prec": 4,
+               "title": "Mutual Information"},
+
+        "GC": {"data": gc, "norm": True, "prec": 4,
+               "title": "Generalized Correlation"},
     }
 
     # Process matrices
@@ -272,7 +285,9 @@ def process_matrices(arg, n, calphas, ave_min_dist, occ_nb, cp, occ_sb, occ_hb,
         matrices[matrix].update({"data": matrix_data})
 
         # Plot matrices
-        plot_matrix(matrix_data, matrix_name.replace(".mat", ".png"))
+        plot_name = matrix_name.replace(".mat", ".png")
+        matrix_title = matrices[matrix]["title"]
+        plot_matrix(matrix_data, matrix_title, plot_name)
 
     saving_time = round(time.time() - first_timer, 2)
     print(f"Until saving & plotting matrices: {saving_time} s")

@@ -128,7 +128,8 @@ def run_pca(arg, matrices, n, first_timer):
     del adj_mat_raw
     adj_name = geom.get_matrix_name(arg.out_dir, arg.title, "ADJACENCY")
     adj_mat = geom.save_matrix(adj_mat, n, adj_name, norm=True, prec=4)
-    geom.plot_matrix(adj_mat, adj_name.replace(".mat", ".png"))
+    matrix_name = "Adjacency matrix"
+    geom.plot_matrix(adj_mat, matrix_name, adj_name.replace(".mat", ".png"))
 
     pca_time = round(time.time() - first_timer, 2)
     print(f"Until PCA & Adjacency matrix computing: {pca_time} s")
