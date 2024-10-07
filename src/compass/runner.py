@@ -5,6 +5,8 @@ Run the computation of descriptors
 # done: change P atoms as NA equivalents to Calpha -> C5'
 # done: noH by default in the min dist calculation
 # todo: remove the Debugging Area
+# todo: compare vs comma
+
 # %%
 import os
 import sys
@@ -49,7 +51,8 @@ def runner():
         mm.compute_descriptors(mini_traj, trajs, arg, resids_to_atoms,
                                resids_to_noh, calphas, oxy, nitro, donors,
                                hydros, acceptors, corr_indices, first_timer)
-
+    # invert CP matrix
+    cp = abs(cp - max(cp))
     # %%=======================================================================
     # 3. Save matrices
     # =========================================================================
