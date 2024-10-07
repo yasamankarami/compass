@@ -223,6 +223,7 @@ def get_frame_info(frame_coords, resids_to_atoms, resids_to_noh, nb_cut,
     Args:
         frame_coords: xyz coordinates of the frame
         resids_to_atoms: dict mapping residues indices to the atoms indices
+        resids_to_noh: dict mapping residues indices to the noh atoms indices
         nb_cut: distance cutoff for non-bonded contacts calculation
         sb_cut: distance cutoff for salt bridges calculation
         da_cut: distance cutoff for DA in hydrogen bonds calculation
