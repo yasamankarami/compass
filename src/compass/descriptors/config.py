@@ -50,6 +50,7 @@ def check_config(config_obj):
 
     # Check sections
     if not sections_equals:
+        print(sections_equals)
         raise ValueError(
             f"\nIncongruence in the number or naming of declared"
             f" sections. Only the following are supported: {allowed_sections}"

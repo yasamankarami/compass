@@ -44,6 +44,7 @@ def perform_pca(data):
     """
     pca = PCA(n_components=2)
     pca_result = pca.fit_transform(data)
+    #print(pca_result)
     return pca_result
 
 

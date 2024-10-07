@@ -78,32 +78,28 @@ def runner():
     arg.pdb_file_path = dict_arg["generals"]["topology"]
     arg.results_dir = dict_arg["generals"]["output_dir"]
     gn.process_graphs(arg)
-    print(
-        f'\nUntil graphs construction: {round(time.time() - first_timer, 2)} s')
+    print(f'\nUntil graphs construction: {round(time.time() - first_timer, 2)} s')
     #
     # # Compute network parameters
     # results_dir = join(arg.results_dir, 'network')
-    # gn.process_graph_files(results_dir)
+    gn.process_graph_files(arg.results_dir)
     # # Find alternative paths for a specific graph
     # # graph, atom_mapping = rf.ReadFiles().load_graph_and_mapping('path_to_graph_file.json')
     # # alternative_paths = network_parameters.find_alternative_paths(graph, atom_mapping, 'source_residue', 'target_residue')
-    # print(
-    #     f'Until network parameters computed: {round(time.time() - first_timer, 2)} s')
+    print(f'Until network parameters computed: {round(time.time() - first_timer, 2)} s')
     #
     # # Compute communities and cliques
     # # method = input("Select community detection method ('leiden' or 'girvan'): ").strip().lower()
-    # method = 'leiden'
-    # gn.process_graph_files_for_communities_and_cliques(results_dir, method)
-    # print(
-    #     f'Until communities and cliques detection: {round(time.time() - first_timer, 2)} s')
+    method = 'leiden'
+    gn.process_graph_files_for_communities_and_cliques(arg.results_dir, method)
+    print(f'Until communities and cliques detection: {round(time.time() - first_timer, 2)} s')
     #
     # # =============================================================================
     # # 6. Generate PyMOL scripts
     # # =============================================================================1
-    # gn.generate_pymol_scripts(results_dir, arg.pdb_file_path)
-    # print(
-    #     f'Until pymol scripts generation: {round(time.time() - first_timer, 2)} s')
-    # print(f"Normal Termination")
+    gn.generate_pymol_scripts(arg.results_dir, arg.pdb_file_path)
+    print(f'Until pymol scripts generation: {round(time.time() - first_timer, 2)} s')
+    print(f"Normal Termination")
 
 # =============================================================================
 # Debugging Area (to be removed)

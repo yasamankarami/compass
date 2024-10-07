@@ -37,7 +37,7 @@ param_space, dict_arg = cfg.parse_params(config_path)
 
 time_gc = time.time()
 
-def process_graphs(param_space, distance_cutoffs=None):
+def process_graphs(param_space, distance_cutoffs=8):
     """
     Constructs graphs based on distance cutoffs, processes them, and saves results.
     
@@ -47,7 +47,7 @@ def process_graphs(param_space, distance_cutoffs=None):
     """
     if distance_cutoffs is None:
         #distance_cutoffs = [4.5, 5, 8, 10, 12]  # Default cutoffs if none are provided
-        distance_cutoffs = [5]
+        distance_cutoffs = [8]
 
     # Initialize GraphConstructor
     graph_constructor = GraphConstructor(

@@ -71,6 +71,7 @@ def compute_gc_matrix(corr_coords, num_atoms_per_residue=1):
     test_matrix = cov_matrix[:2, :2]
     _, _ = calculate_mi_and_gc(test_matrix, num_atoms_per_residue)
     MI_scores, GC_matrix = calculate_mi_and_gc(cov_matrix, num_atoms_per_residue)
+    print("calculating generalised correlations here")
 
     return MI_scores, GC_matrix
 

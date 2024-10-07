@@ -72,7 +72,7 @@ class ReadFiles:
 
         # Concatenate CA and final P/O5' atoms
         #all_atoms = np.concatenate(ca_atoms, final_p_o_atoms)
-        print(len(all_atoms), all_atoms)
+        #print(len(all_atoms), all_atoms)
         
         amino_acid_count = 0
         nucleic_acid_count = 0

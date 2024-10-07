@@ -106,9 +106,9 @@ class PyMOLVisualizer:
             output_pml (str): Prefix for the output PyMOL script files.
         """
         # Read the atom mapping
-        print(atom_mapping)
+        #print(atom_mapping)
         residues = ReadFiles.parse_mapping(atom_mapping)
-        print(residues)
+        #print(residues)
         #for i in range(0, len(residues)): print(i, residues[i])
         if not residues:
             print("Warning: No residues found in the atom mapping file.")
