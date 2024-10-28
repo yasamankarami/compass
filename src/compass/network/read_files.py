@@ -40,44 +40,16 @@ class ReadFiles:
         #print(len(ca_atoms), type(ca_atoms))        
         dna = "(resname =~ '(5|3)?D([ATGC]){1}(3|5)?$')"
         rna = "(resname =~ '(3|5)?R?([AUGC]){1}(3|5)?$')"
-        p_o_atoms = topology.select(f'({dna} or {rna}) and name P or name "O5\'"')
-        #print(len(p_o_atoms),p_o_atoms)
-  
-        # Identify elements to remove (those where element + 3 is also in the set)
-        to_remove = set()
-        for index in p_o_atoms:
-            if (index + 3) in p_o_atoms:
-                to_remove.add(index + 3)
-
-        # Remove the identified elements from the set
-        final_p_o_atoms = [index for index in p_o_atoms if index not in to_remove]
-
-        #all_atoms = sorted(np.concatenate((ca_atoms, final_p_o_atoms)))
-        #print(len(final_p_o_atoms),final_p_o_atoms,type(final_p_o_atoms))
-        
-        all_atoms = np.concatenate((ca_atoms, final_p_o_atoms))
-        #print(len(all_atoms), all_atoms)
-        
+        c5_atoms = trajectory.topology.select(f'({dna} or {rna}) and name "C5\'"')
+        all_atoms = np.concatenate((ca_atoms, c5_atoms))
+    
         atom_mapping = {}  # Maps node index to atom information
         atoms = []
         index_counter = 0
-
-        # Initialize lists to collect CA, P, and O5' atoms
-        ca_atoms = []
-        p_atoms = []
-        o5_atoms = []
-
-        # Dictionary to track residues with P atoms
-        p_residues = {}
-
-        # Concatenate CA and final P/O5' atoms
-        #all_atoms = np.concatenate(ca_atoms, final_p_o_atoms)
-        #print(len(all_atoms), all_atoms)
-        
+    
         amino_acid_count = 0
         nucleic_acid_count = 0
-        missing_residues = []  # Use a set to avoid duplicates
-        
+    
         # Process selected atoms to build atom_mapping
         for atom_index in all_atoms:
             atom = topology.atom(atom_index)
@@ -86,26 +58,21 @@ class ReadFiles:
             residue_name = residue.name
             residue_id = residue.resSeq
             atom_name = atom.name
-
-            residue_key = (residue_name, residue_id, chain_id)
-
+        
             if atom_name == 'CA':
                 amino_acid_count += 1
-                atoms.append((residue_name, atom_name, residue_id, chain_id))
-                atom_mapping[index_counter] = (residue_name, atom_name, residue_id, chain_id)
-                index_counter += 1
-                #missing_residues.append(residue_key)
-            elif atom_name == 'P' or atom_name == "O5'":
+            elif atom_name == "C5'":
                 nucleic_acid_count += 1
-                atoms.append((residue_name, atom_name, residue_id, chain_id))
-                atom_mapping[index_counter] = (residue_name, atom_name, residue_id, chain_id)
-                index_counter += 1
-                #missing_residues.append(residue_key)
+            
+            atoms.append((residue_name, atom_name, residue_id, chain_id))
+            atom_mapping[index_counter] = (residue_name, atom_name, residue_id, chain_id)
+            index_counter += 1
 
-        print(f"Number of amino acid residues processed: {amino_acid_count}")
-        print(f"Number of nucleic acid residues processed: {nucleic_acid_count}")
-        print(f"Number of atoms extracted: {len(atoms)}")
-        print(f"Residues missing 'P' and having 'O5\'': {sorted(missing_residues)}")
+        print(f"🔍 Processing PDB file...")
+        print(f"📦 Processed {amino_acid_count} amino acid residues.")
+        print(f"🧬 Processed {nucleic_acid_count} nucleic acid residues.")
+        print(f"⚙️ Total residues processed: {len(atoms)}.")
+        print(f"📊 Graph network construction is complete.")
         #print(atom_mapping)
         return atom_mapping, atoms
     '''
