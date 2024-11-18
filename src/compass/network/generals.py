@@ -53,7 +53,7 @@ def process_graphs(param_space, distance_cutoffs):
         # Plot and save histogram
         output_file_prefix = os.path.join(param_space.network_dir, f"graph_cutoff_{distance_cutoff}")
         graph_constructor.plot_and_save_histogram(G, output_file_prefix=output_file_prefix)
-        print(f"Processed graph for cutoff {distance_cutoff} in {round(time.time() - start_time, 2)} seconds")
+        print(f" 🖥️  Processed graph for cutoff {distance_cutoff} in {round(time.time() - start_time, 2)} seconds")
 
 
 
@@ -83,7 +83,7 @@ def process_graph_files(results_dir, dist_cutoff_graph):
             heatmap_file = os.path.join(results_dir, f"{prefix}_heatmap.png")
             centralities_file = os.path.join(results_dir,f"{prefix}_centralities.txt")
             edge_betweenness_file = os.path.join(results_dir,f"{prefix}_edge_betweenness.txt")
-            top_nodes_file = os.path.join(results_dir,f"{prefix}_top_10_percent_nodes.txt")
+            top_nodes_file = os.path.join(results_dir,f"{prefix}_top_5_percent_nodes.txt")
             top_shortest_paths_file = os.path.join(results_dir,f"{prefix}_top_10_shortest_paths.txt")
             lengths_file = os.path.join(results_dir,f"{prefix}_shortest_path_lengths.txt")
 
@@ -122,7 +122,7 @@ def find_paths( pdb_file, results_dir, dist_cutoff_graph, source_res,target_res)
             output_pml_file = os.path.join(results_dir,f"{prefix}_alt_paths_{source_res}_{target_res}.pml")
             if os.path.exists(alt_paths_file):
                 visualizer.write_pml_script_for_alternative_paths(alt_paths_file,output_pml_file)
-                print("alternative paths were being written to pymol file")
+                print(f" 🧩  Alternative paths were being written to {alt_paths_file}")
 
 
 def process_graph_files_for_communities_and_cliques(results_dir, dist_cutoff_graph, dist_cutoff_clique):
@@ -152,7 +152,7 @@ def process_graph_files_for_communities_and_cliques(results_dir, dist_cutoff_gra
             communities_leiden, modularity_leiden = community_detector.detect_communities_leiden()
             communities_file = os.path.join(results_dir,f"{prefix}_communities_leiden.txt")
             community_detector.save_communities_to_file(communities_leiden,communities_file)
-            print(f"Communities detected using Leiden algorithm saved to {communities_file}")
+            print(f" 🧩  Communities detected using Leiden algorithm saved to {communities_file}")
             
             
     for filename in os.listdir(results_dir):
@@ -195,9 +195,9 @@ def generate_pymol_scripts(results_dir, pdb_file, dist_cutoff_graph, dist_cutoff
             communities_file = os.path.join(results_dir,f"{prefix}_communities_leiden.txt")
             centrality_file = os.path.join(results_dir,f"{prefix}_centralities.txt")
             edge_betweenness_file = os.path.join(results_dir,f"{prefix}_edge_betweenness.txt")
-            top_nodes_file = os.path.join(results_dir,f"{prefix}_top_10_percent_nodes.txt")
+            top_nodes_file = os.path.join(results_dir,f"{prefix}_top_5_percent_nodes.txt")
             paths_file = os.path.join(results_dir, f"{prefix}_paths.txt")
-            output_pml_file = os.path.join(results_dir, f"{prefix}_top_10.pml")
+            output_pml_file = os.path.join(results_dir, f"{prefix}_top_5_percent.pml")
             output_pml_communities = os.path.join(results_dir,f"{prefix}_communities.pml")
             output_top_paths = os.path.join(results_dir,f"{prefix}_top_paths.pml")
             top_15_file = os.path.join(results_dir,f"{prefix}_top_10_shortest_paths.txt")
@@ -213,7 +213,7 @@ def generate_pymol_scripts(results_dir, pdb_file, dist_cutoff_graph, dist_cutoff
                 visualizer.graph_pml(centrality_file,edge_betweenness_file, os.path.join(results_dir,f"{prefix}_graph"))
 
             if os.path.exists(top_nodes_file):
-                print(f"Processing: {pdb_file}, {top_nodes_file}, {output_pml_file}")
+                #print(f" ⚙️ Processing: {pdb_file}, {top_nodes_file}, {output_pml_file}")
                 visualizer.highlight_top_nodes_pml(pdb_file, atom_mapping,top_nodes_file,output_pml_file)
 
             if os.path.exists(paths_file):
@@ -232,4 +232,4 @@ def generate_pymol_scripts(results_dir, pdb_file, dist_cutoff_graph, dist_cutoff
             if os.path.exists(cliques_file):
                 visualizer.cliques_pml(cliques_file, output_pml_cliques)
 
-            print(f"⏳PyMOL scripts for {filename} generated.")
+            print(f" 🖥️  PyMOL scripts generated.")

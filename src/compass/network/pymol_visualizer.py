@@ -122,7 +122,7 @@ class PyMOLVisualizer:
             f.write("show cartoon\n")
             f.write("bg_color white\n")
 
-        print(f"PyMOL script for communities saved to {output_pml_file}")
+        print(f" 🧊  PyMOL script for communities saved to {output_pml_file}")
 
     def graph_pml(self, centrality_file, edge_betweenness_file, output_pml):
         """
@@ -205,7 +205,7 @@ class PyMOLVisualizer:
             file.write("bg_color white\n")
             file.close()
 
-        print(f"PyMOL script for graph attributes saved with prefix {output_pml}")
+        print(f" 🧊  PyMOL script for graph attributes saved with prefix {output_pml}")
 
     def parse_cliques_file(self, cliques_file):
         """
@@ -268,7 +268,7 @@ class PyMOLVisualizer:
             f.write("set sphere_scale, 0.7\n")
             f.write("bg_color white\n")
 
-        print(f"PyMOL script for cliques saved to {output_pml}")
+        print(f" 🧊  PyMOL script for cliques saved to {output_pml}")
 
 
 
@@ -339,7 +339,7 @@ class PyMOLVisualizer:
                 f.write("set sphere_scale, 0.7\n")  # Adjust sphere size as needed
                 f.write("bg_color white\n")
 
-            print(f"PyMOL script to highlight top nodes saved to {output_pml_file}")
+            print(f" 🧊  PyMOL script to highlight top nodes saved to {output_pml_file}")
         except Exception as e:
             print(f"Error writing PyMOL script to {output_pml_file}: {e}")
 
@@ -372,7 +372,7 @@ class PyMOLVisualizer:
                 f.write(f"color black, path_{res1}_{res2}\n")
                 f.write(f"hide labels, path_{res1}_{res2}\n")
 
-        print(f"PyMOL script for residue paths saved to {output_pml_file}")
+        print(f" 🧊  PyMOL script for residue paths saved to {output_pml_file}")
 
     def write_pml_script_for_top_shortest_paths(self, top_50_file, edge_betweenness_file, output_pml_file):
         """
@@ -415,6 +415,10 @@ class PyMOLVisualizer:
         # Open the output file for writing
         try:
             with open(output_pml_file, 'w') as f:
+                # Track unique commands to avoid repetition
+                written_selections = set()
+                written_distances = set()
+                written_spheres = set()
                 # Load the PDB file
                 f.write(f"load {self.pdb_file}\n")
                 f.write(f"set cartoon_color, grey80\n")
@@ -435,18 +439,46 @@ class PyMOLVisualizer:
                         if betweenness_value is not None:
                             norm_betweenness = betweenness_value / max_betweenness
                             thickness = 1 + 10 * norm_betweenness
-
-                            # Write PyMOL script lines
-                            f.write(f"select resi_{res_num1}, chain {chain_id1} and resi {res_num1} and name {atom_name1}\n")
-                            f.write(f"select resi_{res_num2}, chain {chain_id2} and resi {res_num2} and name {atom_name2}\n")
-                            f.write(f"show spheres, resi_{res_num1} and chain {chain_id1} and name {atom_name1} or resi_{res_num2} and chain {chain_id2} and name {atom_name2}\n")
-                            #f.write(f"show spheres, resi_{res_num1} and name {atom_name1} or resi_{res_num2} and name {atom_name2}\n")
-                            f.write(f"distance edge_{res_num1}_{res_num2}, chain {chain_id1} and resi {res_num1} and name {atom_name1}, chain {chain_id2} and resi {res_num2} and name {atom_name2}\n")
-                            f.write(f"set dash_width, {thickness:.2f}, edge_{res_num1}_{res_num2}\n")
+                            
+                            # Generate selection commands only if not already written
+                            selection1 = f"select resi_{res_num1}, chain {chain_id1} and resi {res_num1} and name {atom_name1}"
+                            selection2 = f"select resi_{res_num2}, chain {chain_id2} and resi {res_num2} and name {atom_name2}"
+                    
+                            if selection1 not in written_selections:
+                                f.write(f"{selection1}\n")
+                                written_selections.add(selection1)
+                            
+                            if selection2 not in written_selections:
+                                f.write(f"{selection2}\n")
+                                written_selections.add(selection2)
+                            
+                            # Generate sphere display command only if not already written
+                            sphere_cmd = (
+                                f"show spheres, resi_{res_num1} and chain {chain_id1} and name {atom_name1} or "
+                                f"resi_{res_num2} and chain {chain_id2} and name {atom_name2}"
+                            )
+                            if sphere_cmd not in written_spheres:
+                                f.write(f"{sphere_cmd}\n")
+                                written_spheres.add(sphere_cmd)
+                    
+                            # Generate distance command only if not already written
+                            # Sort res_num to ensure consistent ordering
+                            sorted_res = sorted([(res_num1, chain_id1, atom_name1), (res_num2, chain_id2, atom_name2)])
+                            distance_key = f"edge_{sorted_res[0][0]}_{sorted_res[1][0]}"
+                            distance_cmd = (
+                                f"distance {distance_key}, "
+                                f"chain {sorted_res[0][1]} and resi {sorted_res[0][0]} and name {sorted_res[0][2]}, "
+                                f"chain {sorted_res[1][1]} and resi {sorted_res[1][0]} and name {sorted_res[1][2]}"
+                            )
+                    
+                            if distance_cmd not in written_distances:
+                                f.write(f"{distance_cmd}\n")
+                                f.write(f"set dash_width, {thickness:.2f}, {distance_key}\n")
+                                written_distances.add(distance_cmd)
                         else:
                             print(f"Warning: Edge key ({path[i]}, {path[i + 1]}) or ({path[i + 1]}, {path[i]}) not found in edge_betweenness.")
-
-
+        
+                # Finalize the PyMOL script
                 # Finalize the PyMOL script
                 f.write("hide labels \n")
                 f.write("set dash_gap, 0 \n")
@@ -456,7 +488,7 @@ class PyMOLVisualizer:
                 #f.write("cmd.show_as('spheres', 'backbone')\n")
                 f.write("set sphere_transparency, 0.3 \n")
 
-            print(f"PyMOL script for top shortest paths saved to {output_pml_file}")
+            print(f" 🧊  PyMOL script for top shortest paths saved to {output_pml_file}")
 
         except Exception as e:
             print(f"Error writing PyMOL script to file: {e}")
@@ -523,7 +555,7 @@ class PyMOLVisualizer:
                 #f.write("cmd.show_as('spheres', 'backbone')\n")
                 f.write("set sphere_transparency, 0.3 \n")
 
-            print(f"PyMOL script for top shortest paths saved to {output_pml_file}")
+            #print(f" 🧊  PyMOL script for top shortest paths saved to {output_pml_file}")
 
         except Exception as e:
             print(f"Error writing PyMOL script to file: {e}")

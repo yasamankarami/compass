@@ -53,6 +53,7 @@ def runner():
                                hydros, acceptors, corr_indices, first_timer)
     ## invert CP matrix
     cp = abs(cp - max(cp))
+    #cp = abs(cp - 1)
     ## %%=======================================================================
     ## 3. Save matrices
     ## =========================================================================
@@ -84,19 +85,19 @@ def runner():
     
     #print(dist_cutoffs)
     gn.process_graphs(arg, dist_cutoffs)
-    print(f'\nUntil graphs construction: {round(time.time() - first_timer, 2)} s')
+    print(f' ⏳  Until graphs construction: {round(time.time() - first_timer, 2)} s')
     
     # Compute network parameters
     gn.process_graph_files(arg.network_dir,dist_cutoffs[0] )
     # Find alternative paths for a specific graph
     # graph, atom_mapping = rf.ReadFiles().load_graph_and_mapping('path_to_graph_file.json')
     # alternative_paths = network_parameters.find_alternative_paths(graph, atom_mapping, 'source_residue', 'target_residue')
-    print(f'Until network parameters computed: {round(time.time() - first_timer, 2)} s')
+    print(f' ⏳  Until network parameters computed: {round(time.time() - first_timer, 2)} s')
 
     # Compute communities and cliques
     # method = input("Select community detection method ('leiden' or 'girvan'): ").strip().lower()
     gn.process_graph_files_for_communities_and_cliques(arg.network_dir, dist_cutoffs[0],dist_cutoffs[1] )
-    print(f'Until communities and cliques detection: {round(time.time() - first_timer, 2)} s')
+    print(f' ⏳  Until communities and cliques detection: {round(time.time() - first_timer, 2)} s')
 
     # =============================================================================
     # 6. Generate PyMOL scripts
@@ -108,8 +109,8 @@ def runner():
         target_residue = dict_arg["paths"]["target"]
         #print(source_residue, target_residue)
         gn.find_paths(arg.pdb_file_path,arg.network_dir,dist_cutoffs[0],source_residue,target_residue)
-    print(f'Until pymol scripts generation: {round(time.time() - first_timer, 2)} s')
-    print(f"Normal Termination")
+    print(f' ⏳  Until pymol scripts generation: {round(time.time() - first_timer, 2)} s')
+    print(f"**** -------Normal Termination -------****")
 
 # =============================================================================
 # Debugging Area (to be removed)

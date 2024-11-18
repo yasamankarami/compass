@@ -57,7 +57,7 @@ class CommunityDetector:
                 original_node = nodes[node_idx]
                 communities[original_node] = idx
         
-        print(f"Leiden detected {len(set(communities.values()))} communities with modularity {modularity:.4f}.")
+        print(f" 🧩  Leiden detected {len(set(communities.values()))} communities with modularity {modularity:.4f}.")
         
         return communities, modularity
     
@@ -95,7 +95,7 @@ class CommunityDetector:
                 for comm_idx, members in sorted(community_groups.items()):
                     members_str = ', '.join(map(str, members))
                     f.write(f"Community {comm_idx}: {members_str}\n")
-            print(f"Communities saved to {output_file}")
+            print(f" 🧩  Communities saved to {output_file}")
         except Exception as e:
             print(f"Error writing communities to {output_file}: {e}")
             raise
@@ -183,7 +183,7 @@ class CliqueDetector:
                 for clique_idx, members in cliques.items():
                     all_cliques_file.write(f"Clique {clique_idx}: {', '.join(map(str, members))}\n")
             
-            print(f"Cliques saved to {output_file}")
+            print(f" 🧩  Cliques saved to {output_file}")
             
         except IOError as e:
             print(f"Error writing cliques to file: {e}")

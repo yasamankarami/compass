@@ -290,7 +290,7 @@ def process_matrices(arg, n, calphas, ave_min_dist, occ_nb, cp, occ_sb, occ_hb,
         plot_matrix(matrix_data, matrix_title, plot_name)
 
     saving_time = round(time.time() - first_timer, 2)
-    print(f"Until saving & plotting matrices: {saving_time} s")
+    print(f" ⏱️  Until saving & plotting matrices: {saving_time} s")
     return matrices, matrices_name
 
 #

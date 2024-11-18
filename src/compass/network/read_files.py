@@ -40,8 +40,9 @@ class ReadFiles:
         #print(len(ca_atoms), type(ca_atoms))        
         dna = "(resname =~ '(5|3)?D([ATGC]){1}(3|5)?$')"
         rna = "(resname =~ '(3|5)?R?([AUGC]){1}(3|5)?$')"
-        c5_atoms = trajectory.topology.select(f'({dna} or {rna}) and name "C5\'"')
-        all_atoms = np.concatenate((ca_atoms, c5_atoms))
+        p_atoms = trajectory.topology.select(f'({dna} or {rna}) and name "C5\'"')
+        #all_atoms = np.concatenate((ca_atoms, c5_atoms))
+        all_atoms = sorted(np.concatenate((ca_atoms, p_atoms)))
     
         atom_mapping = {}  # Maps node index to atom information
         atoms = []
@@ -68,11 +69,11 @@ class ReadFiles:
             atom_mapping[index_counter] = (residue_name, atom_name, residue_id, chain_id)
             index_counter += 1
 
-        print(f"🔍 Processing PDB file...")
-        print(f"📦 Processed {amino_acid_count} amino acid residues.")
-        print(f"🧬 Processed {nucleic_acid_count} nucleic acid residues.")
-        print(f"⚙️ Total residues processed: {len(atoms)}.")
-        print(f"📊 Graph network construction is complete.")
+        print(f" 🔍  Processing matrices for graph construction")
+        print(f" 📦  Processed {amino_acid_count} amino acid residues.")
+        print(f" 🧬  Processed {nucleic_acid_count} nucleic acid residues.")
+        print(f" ⚙️   Total residues processed: {len(atoms)}.")
+        print(f" 🕸️  Graph network construction is complete.")
         #print(atom_mapping)
         return atom_mapping, atoms
     '''

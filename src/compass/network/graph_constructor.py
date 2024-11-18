@@ -92,7 +92,7 @@ class GraphConstructor:
         }
         with open(output_file, 'w') as f:
             json.dump(data, f)
-        print(f"Graph and atom mapping saved to {output_file}")
+        print(f" 📥  Graph and atom mapping saved to {output_file}")
 
 
     def plot_and_save_histogram(self, G, output_file_prefix):
@@ -114,7 +114,7 @@ class GraphConstructor:
         histogram_file = f"{output_file_prefix}_histogram.png"
         plt.savefig(histogram_file)
         plt.close()
-        print(f"Histogram of edge weights saved to {histogram_file}")
+        print(f" 📈  Histogram of edge weights saved to {histogram_file}")
 
     def ensure_graph_connectivity(self, G):
         """
@@ -127,7 +127,7 @@ class GraphConstructor:
             nx.Graph: The connected graph.
         """
         if not nx.is_connected(G):
-            print("Graph is not connected. Attempting to connect components.")
+            #print("Graph is not connected. Attempting to connect components.")
             components = list(nx.connected_components(G))
             largest_component = max(components, key=len)
             subgraphs = [G.subgraph(component) for component in components]
@@ -138,7 +138,7 @@ class GraphConstructor:
                     G.add_edges_from(
                         [(list(largest_component)[0], list(component)[0])]
                     )
-            print(f"Graph connected with {len(components)} components.")
+            #print(f"Graph connected with {len(components)} components.")
 
         return G
 

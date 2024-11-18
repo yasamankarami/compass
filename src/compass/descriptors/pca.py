@@ -160,7 +160,7 @@ def run_pca(arg, matrices, n, first_timer):
     geom.plot_matrix(adj_mat, matrix_name, adj_name.replace(".mat", ".png"))
 
     pca_time = round(time.time() - first_timer, 2)
-    print(f"Until PCA & Adjacency matrix computing: {pca_time} s")
+    print(f" ⏱️  Until PCA & Adjacency matrix computing: {pca_time} s")
     return adj_name
 
 # =============================================================================
