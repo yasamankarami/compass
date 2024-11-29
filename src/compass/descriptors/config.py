@@ -10,7 +10,7 @@ allowed_params = {
     "salt_bridges": {"NO_cut"},
     "hbonds": {"DA_cut", "HA_cut", "DHA_cut", "heavy"},
     "distance cutoffs":{"Graph","Cliques"},
-    "paths":{"find_path","source","target"}
+    "paths":{"find_path","sources","targets"}
 }
 
 allowed_heavies = {"S", "N", "O"}
@@ -112,8 +112,8 @@ def parse_params(config_path):
 
     #alternative paths between residues
     param_space.find_path = str(param_dict["paths"]["find_path"])
-    param_space.source_residue = str(param_dict["paths"]["source"])
-    param_space.target_residue = str(param_dict["paths"]["target"])
+    param_space.source_residue = str(param_dict["paths"]["sources"])
+    param_space.target_residue = str(param_dict["paths"]["targets"])
 
     if not allowed_heavies.issuperset(param_space.heavies):
         raise ValueError(

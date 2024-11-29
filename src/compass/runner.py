@@ -76,8 +76,9 @@ def runner():
     # Construct graphs
     arg.adjacency_file = adj_name
     arg.min_dist_matrix_file = matrices_names["MINDIST"]
-    #arg.adjacency_file = '/users/sbheemir/september_2024/results/1u0b/matrices/1u0b_ADJACENCY.mat'
-    #arg.min_dist_matrix_file = '/users/sbheemir/september_2024/results/1u0b/matrices/1u0b_MINDIST.mat'
+    
+    #arg.adjacency_file = '/users/sbheemir/september_2024/results/1kx5/matrices/1kx5_ADJACENCY.mat'
+    #arg.min_dist_matrix_file = '/users/sbheemir/september_2024/results/1kx5/matrices/1kx5_MINDIST.mat'
     arg.pdb_file_path = dict_arg["generals"]["topology"]
     arg.network_dir = join(dict_arg["generals"]["output_dir"], 'network')
     os.makedirs(arg.network_dir, exist_ok=True)
@@ -105,10 +106,21 @@ def runner():
     gn.generate_pymol_scripts(arg.network_dir, arg.pdb_file_path, dist_cutoffs[0],dist_cutoffs[1])
     #print(dict_arg["paths"]["find_path"])
     if dict_arg["paths"]["find_path"] == 'True':
+        source_residues = dict_arg["paths"]["sources"].split(",")  # Convert comma-separated string to list
+        target_residues = dict_arg["paths"]["targets"].split(",")  # Convert comma-separated string to list
+    
+        for source_residue in source_residues:
+            for target_residue in target_residues:
+                #print(f"Finding path between {source_residue} and {target_residue}")
+                gn.find_paths(arg.pdb_file_path, arg.network_dir, dist_cutoffs[0], source_residue.strip(), target_residue.strip())
+
+    '''
+    if dict_arg["paths"]["find_path"] == 'True':
         source_residue = dict_arg["paths"]["source"]
         target_residue = dict_arg["paths"]["target"]
         #print(source_residue, target_residue)
         gn.find_paths(arg.pdb_file_path,arg.network_dir,dist_cutoffs[0],source_residue,target_residue)
+    '''
     print(f' ⏳  Until pymol scripts generation: {round(time.time() - first_timer, 2)} s')
     print(f"**** -------Normal Termination -------****")
 

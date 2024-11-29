@@ -116,13 +116,13 @@ def find_paths( pdb_file, results_dir, dist_cutoff_graph, source_res,target_res)
             # Define output file names based on the JSON file prefix
             visualizer = PyMOLVisualizer(pdb_file=pdb_file,atom_mapping=atom_mapping,graph=graph)
             prefix = filename.replace('.json', '')
-            alt_paths_file = os.path.join(results_dir,f"{prefix}_alt_paths_{source_res}_{target_res}.txt")
+            alt_paths_file = os.path.join(results_dir,f"{prefix}_alt_paths.txt")
             network_parameters.find_alternative_paths(source_res, target_res, alt_paths_file )
             #print(alternative_paths)
-            output_pml_file = os.path.join(results_dir,f"{prefix}_alt_paths_{source_res}_{target_res}.pml")
+            output_pml_file = os.path.join(results_dir,f"{prefix}_alt_paths.pml")
             if os.path.exists(alt_paths_file):
                 visualizer.write_pml_script_for_alternative_paths(alt_paths_file,output_pml_file)
-                print(f" 🧩  Alternative paths were being written to {alt_paths_file}")
+                #print(f" 🧩  Alternative paths were being written to {alt_paths_file}")
 
 
 def process_graph_files_for_communities_and_cliques(results_dir, dist_cutoff_graph, dist_cutoff_clique):
@@ -140,12 +140,12 @@ def process_graph_files_for_communities_and_cliques(results_dir, dist_cutoff_gra
         if filename.endswith('.json') and filename.startswith('graph_cutoff_'+ dist_cutoff_graph):
             # Construct the full path to the JSON file
             json_path = os.path.join(results_dir, filename)
+            graph, atom_mapping = ReadFiles().load_graph_and_mapping(json_path)
             # Load the graph and atom mapping
-            with open(json_path, 'r') as f:
-                data = json.load(f)
-            G = nx.readwrite.json_graph.node_link_graph(data['graph'])
+            #with open(json_path, 'r') as f:data = json.load(f)
+            #G = graph
             # Initialize CommunityDetector and CliqueDetector
-            community_detector = CommunityDetector(G=G)
+            community_detector = CommunityDetector(G=graph, atom_mapping = atom_mapping)
             # Define output file names based on the JSON file prefix
             prefix = filename.replace('.json', '')
             # Detect communities based on selected method
@@ -159,12 +159,12 @@ def process_graph_files_for_communities_and_cliques(results_dir, dist_cutoff_gra
         if filename.endswith('.json') and filename.startswith('graph_cutoff_'+dist_cutoff_clique):
             # Construct the full path to the JSON file
             json_path = os.path.join(results_dir, filename)
+            graph, atom_mapping = ReadFiles().load_graph_and_mapping(json_path)
             # Load the graph and atom mapping
-            with open(json_path, 'r') as f:
-                data = json.load(f)
-            G = nx.readwrite.json_graph.node_link_graph(data['graph'])
+            #with open(json_path, 'r') as f:data = json.load(f)
+            #G = graph
             # Initialize CliqueDetector
-            clique_detector = CliqueDetector(G=G)
+            clique_detector = CliqueDetector(G= graph, atom_mapping = atom_mapping )
             # Define output file names based on the JSON file prefix
             prefix = filename.replace('.json', '')
             cliques_file = os.path.join(results_dir, f"{prefix}_cliques.txt")

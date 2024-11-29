@@ -198,45 +198,96 @@ class ReadFiles:
         
     def read_centrality_from_file(file_path):
         """
-        Reads centrality values from a file.
+        Processes a file containing node metrics.
 
         Args:
-            file_path (str): Path to the file containing centrality values.
+            file_path (str): Path to the input file.
 
         Returns:
-            dict: A dictionary mapping node indices to centrality values.
+            pd.DataFrame: A DataFrame containing parsed node metrics.
         """
-        centrality = {}
+        data = []
+        
         with open(file_path, 'r') as f:
-            # Skip the header line
-            next(f)
             for line in f:
-                parts = line.strip().split()
-                #print(parts)
-                if len(parts) == 4:
-                    node, betweenness, closeness, degree = parts
-                    centrality[int(node)] = float(closeness)  # Save the third value (closeness) as centrality
-        return centrality
+                line = line.strip()
+            
+                # Skip empty lines or headers
+                if not line or line.startswith("Node Res_num Chain_ID"):
+                    continue
+                
+                try:
+                    # Split the line into components
+                    parts = line.split("\t")
+                    
+                    # Parse the Node column (e.g., "Node (1,A)")
+                    node_info = parts[0].split(" ")
+                    node_details = node_info[1].strip("()").split(",")
+                    #print(node_details)
+                    node_res_num = int(node_details[0])  # Extract residue number
+                    chain_id = node_details[1]          # Extract chain ID
+    
+                    # Parse the remaining columns
+                    betweenness = float(parts[1])
+                    closeness = float(parts[2])
+                    degree = int(parts[3])
+
+                    # Append to the data list
+                    data.append({
+                        "Node_Res_Num": node_res_num,
+                        "Chain_ID": chain_id,
+                        "Betweenness": betweenness,
+                        "Closeness": closeness,
+                        "Degree": degree
+                    })
+                except (ValueError, IndexError) as e:
+                    print(f"Skipping line due to parsing error: {line} ({e})")
+    
+       
+        # Convert data to a Pandas DataFrame for further analysis
+        df = pd.DataFrame(data)
+        return df
 
     def read_edge_betweenness_from_file(file_path):
-        """
-        Reads edge betweenness values from a file.
+        edges = []
     
-        Args:
-            file_path (str): Path to the file containing edge betweenness values.
-
-        Returns:
-            dict: A dictionary mapping edge tuples to betweenness values.
-        """
-        edge_betweenness = {}
         with open(file_path, 'r') as f:
-            # Skip the header line
-            next(f)
             for line in f:
-                parts = line.strip().split()
-                if len(parts) == 2:  # Edge and betweenness value
-                    edge_str, value = parts
-                    node1, node2 = map(int, edge_str.split('-'))
-                    edge_betweenness[(node1, node2)] = float(value)
-        return edge_betweenness
+                line = line.strip()
+            
+                # Skip empty lines or headers
+                if not line or line.startswith("Edge"):
+                    continue
+            
+                try:
+                    # Split the line into edge and betweenness
+                    parts = line.split("\t")
+                
+                    # Parse the edge column (e.g., "(1,A)-(2,A)")
+                    edge_info = parts[0].strip("()").split(")-(")
+                    node1 = edge_info[0].strip("()")
+                    node2 = edge_info[1].strip("()")
+                    
+                    # Extract residue numbers and chain IDs
+                    res1, chain1 = node1.split(",")
+                    res2, chain2 = node2.split(",")
+                
+                    # Parse betweenness
+                    betweenness = float(parts[1])
+                
+                    # Append the data to the list
+                    edges.append({
+                        "Res1": int(res1),
+                        "Chain1": chain1,
+                        "Res2": int(res2),
+                        "Chain2": chain2,
+                        "Betweenness": betweenness
+                    })
+                except (ValueError, IndexError) as e:
+                    print(f"Skipping line due to parsing error: {line} ({e})")
+    
+        # Convert list of edges to DataFrame
+        df = pd.DataFrame(edges)
+        return df
+
 

@@ -13,16 +13,17 @@ class CommunityDetector:
         G (nx.Graph): The input graph for community detection.
     """
     
-    def __init__(self, G):
+    def __init__(self, G, atom_mapping=None):
         """
-        Initializes the CommunityDetector with a graph.
-        
+        Initialize the NetworkParameters class.
+
         Args:
-            G (nx.Graph): The input graph for community detection.
+            G (nx.Graph): Network graph with weighted edges.
+            atom_mapping (dict, optional): Dictionary mapping node indices to atom information.
+                Expected format: {node_id: (chain, residue_name, residue_number, atom_name)}
         """
-        if not isinstance(G, nx.Graph):
-            raise TypeError("Input must be a NetworkX graph")
         self.G = G
+        self.atom_mapping = atom_mapping if atom_mapping else {}
     
     def detect_communities_leiden(self):
         """
@@ -62,7 +63,7 @@ class CommunityDetector:
         return communities, modularity
     
     @staticmethod
-    def _collect_members_partition(communities):
+    def _collect_members_partition(self, communities):
         """
         Organizes communities by community index.
         
@@ -76,7 +77,10 @@ class CommunityDetector:
         for node, comm_idx in communities.items():
             if comm_idx not in community_groups:
                 community_groups[comm_idx] = []
-            community_groups[comm_idx].append(node)
+            #print(self.atom_mapping.keys())
+            res_name, atom_name, res_num, chain_id = self.atom_mapping.get(str(node), ("Unknown", "Unknown", "Unknown", "Unknown"))
+            str_node_details = f"{chain_id}_{res_num}"
+            community_groups[comm_idx].append(str_node_details)
         return community_groups
     
     def save_communities_to_file(self, communities, output_file):
@@ -89,11 +93,13 @@ class CommunityDetector:
         """
         try:
             # First, organize communities by community index
-            community_groups = self._collect_members_partition(communities)
-            
+            community_groups = self._collect_members_partition(self, communities)
+            #print(community_groups)
             with open(output_file, 'w') as f:
+                f.write(f"Communities file. This file contains the community members information in the order chain_id residue_number\n")
                 for comm_idx, members in sorted(community_groups.items()):
                     members_str = ', '.join(map(str, members))
+                    #print(self.atom_mapping.keys())
                     f.write(f"Community {comm_idx}: {members_str}\n")
             print(f" 🧩  Communities saved to {output_file}")
         except Exception as e:
@@ -110,16 +116,17 @@ class CliqueDetector:
         G (nx.Graph): The input graph for clique detection.
     """
     
-    def __init__(self, G: nx.Graph):
+    def __init__(self, G, atom_mapping=None):
         """
-        Initializes the CliqueDetector with a graph.
-        
+        Initialize the NetworkParameters class.
+
         Args:
-            G (nx.Graph): The input graph for clique detection.
+            G (nx.Graph): Network graph with weighted edges.
+            atom_mapping (dict, optional): Dictionary mapping node indices to atom information.
+                Expected format: {node_id: (chain, residue_name, residue_number, atom_name)}
         """
-        if not isinstance(G, nx.Graph):
-            raise TypeError("Input must be a NetworkX graph")
         self.G = G
+        self.atom_mapping = atom_mapping if atom_mapping else {}
     
     def detect_cliques(self) -> Dict[int, List]:
         """
@@ -178,12 +185,23 @@ class CliqueDetector:
         Raises:
             IOError: If there's an error writing to the files.
         """
+        def get_details(member):
+            # Fetch atom details for each member
+            res_name, atom_name, res_num, chain_id = self.atom_mapping.get(str(member), ("Unknown", "Unknown", "Unknown", "Unknown"))
+            # Prepare a string representing the node's details
+            str_node_details = f"{chain_id}_{res_num}"
+            return str_node_details
+
         try:           
             with open(output_file, 'w') as all_cliques_file:
+                all_cliques_file.write(f"Cliques file. This file contains the clique members information in the order chain_id residue_number\n")
                 for clique_idx, members in cliques.items():
-                    all_cliques_file.write(f"Clique {clique_idx}: {', '.join(map(str, members))}\n")
+                    # Apply get_details to each member in the clique
+                    new_members = [get_details(member) for member in members]
+                    # Write the clique with its members to the file
+                    all_cliques_file.write(f"Clique {clique_idx}: {', '.join(new_members)}\n")
             
-            print(f" 🧩  Cliques saved to {output_file}")
+            print(f"🧩  Cliques saved to {output_file}")
             
         except IOError as e:
             print(f"Error writing cliques to file: {e}")
