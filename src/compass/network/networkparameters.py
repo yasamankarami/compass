@@ -84,9 +84,6 @@ class NetworkParameters:
                 path = shortest_paths[source][target]
                 path_str = " -> ".join(map(str, path))
                 file.write(f"{source} -> {target}: Length = {length:.2f}, Path = [{path_str}]\n")
-                #print(self.atom_mapping)
-                
-                # Map nodes to residues and write the mapped path
                 mapped_path_str = " -> ".join( f"Residue {self.atom_mapping.get(str(node), ('Unknown', 'Unknown', -1, 'Unknown'))[2]} {self.atom_mapping.get(str(node), ('Unknown', 'Unknown', -1, 'Unknown'))[1]} {self.atom_mapping.get(str(node), ('Unknown', 'Unknown', -1, 'Unknown'))[3]}" for node in path )
                 file.write(f"Path_mapped = [{mapped_path_str}]\n\n")
 

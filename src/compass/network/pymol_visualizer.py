@@ -472,7 +472,6 @@ class PyMOLVisualizer:
                                 f.write(f"select resi_{res_num1}, chain {chain1} and resi {res_num1} and name {atom_name1}\n")
                                 f.write(f"select resi_{res_num2}, chain {chain2} and resi {res_num2} and name {atom_name2}\n")
                                 f.write(f"show spheres, resi_{res_num1} and chain {chain1} and name {atom_name1} or resi_{res_num2} and chain {chain2} and name {atom_name2}\n")
-                                #f.write(f"show spheres, resi_{res_num1} and name {atom_name1} or resi_{res_num2} and name {atom_name2}\n")
                                 f.write(f"distance edge_{res_num1}_{res_num2}, chain {chain1} and resi {res_num1} and name {atom_name1}, chain {chain2} and resi {res_num2} and name {atom_name2}\n")
                                 f.write(f"set dash_width, {thickness:.2f}, edge_{res_num1}_{res_num2}\n")
                             else:
@@ -485,8 +484,6 @@ class PyMOLVisualizer:
                 f.write("set dash_gap, 0 \n")
                 f.write("set dash_color, grey10 \n")
                 f.write("bg_color white\n")
-                #f.write("select backbone, name P or name CA\n")
-                #f.write("cmd.show_as('spheres', 'backbone')\n")
                 f.write("set sphere_transparency, 0.3 \n")
 
             print(f"PyMOL script for top shortest paths saved to {output_pml_file}")

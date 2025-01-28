@@ -37,7 +37,7 @@ class CommunityDetector:
         for idx, community in enumerate(partition):
             for node in community:
                 communities[node] = idx
-        
+
         # Collect community members
         community_members = {}
         for node, community in communities.items():
@@ -46,8 +46,6 @@ class CommunityDetector:
             community_members[community].append(node)
         
         print(f"Leiden detected {len(community_members)} communities with modularity {modularity:.4f}.")
-        #for community, members in community_members.items():
-        #    print(f"Community {community}: {members}")
         
         return communities, modularity
 
@@ -78,8 +76,7 @@ class CommunityDetector:
         modularity = nx.algorithms.community.quality.modularity(self.G, limited)
         
         print(f"Girvan-Newman detected {len(community_members)} communities with modularity {modularity:.4f}.")
-        #for community, members in community_members.items():
-        #    print(f"Community {community}: {members}")
+
         
         return communities, modularity
 
@@ -133,7 +130,7 @@ class CliqueDetector:
             dict: A dictionary where keys are clique indices and values are lists of nodes in each clique.
         """
         cliques = list(nx.find_cliques(self.G))
-        
+
         # Create a dictionary to store the cliques
         clique_dict = {}
         for idx, clique in enumerate(cliques):

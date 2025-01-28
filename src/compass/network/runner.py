@@ -28,9 +28,6 @@ if len(sys.argv) != 2:
 config_path = sys.argv[1]
 param_space, dict_arg = cfg.parse_params(config_path) 
 
-# Debugging output (optional)
-#pprint(dict_arg)
-
 # =============================================================================
 # Graphs construction
 # =============================================================================
@@ -46,7 +43,6 @@ def process_graphs(param_space, distance_cutoffs=None):
         distance_cutoffs (list, optional): List of distance cutoffs to use. If None, a default list is used.
     """
     if distance_cutoffs is None:
-        #distance_cutoffs = [4.5, 5, 8, 10, 12]  # Default cutoffs if none are provided
         distance_cutoffs = [5]
 
     # Initialize GraphConstructor
@@ -59,42 +55,25 @@ def process_graphs(param_space, distance_cutoffs=None):
     # Iterate over each distance cutoff to build and process the graph
     for distance_cutoff in graph_constructor.distance_cutoffs:
         start_time = time.time()
-        
         # Build the graph
         G = graph_constructor.build_graph_from_matrices(
             distance_file=param_space.min_dist_matrix_file,
             adjacency_file=param_space.adjacency_file,
             distance_cutoff=distance_cutoff
         )
-        
         # Ensure graph connectivity
         G = graph_constructor.ensure_graph_connectivity(G)
-        
         # Generate atom mapping before saving the graph
         atom_mapping, _ = graph_constructor.reader.atom_mapping(param_space.pdb_file_path)
-        
         # Define file names based on the distance cutoff
         graph_filename = f"graph_cutoff_{distance_cutoff}.json"
         output_graph_file = os.path.join(param_space.results_dir, graph_filename)
-        
         # Save the graph and atom mapping
         graph_constructor.save_graph_and_mapping(G, atom_mapping, output_file=output_graph_file)
-        
         # Plot and save histogram
         output_file_prefix = os.path.join(param_space.results_dir, f"graph_cutoff_{distance_cutoff}")
         graph_constructor.plot_and_save_histogram(G, output_file_prefix=output_file_prefix)
-
         print(f"Processed graph for cutoff {distance_cutoff} in {round(time.time() - start_time, 2)} seconds")
-    
-    #print(param_space)
-    # Write selected atoms to a PDB file using the atom mapping
-    #input_pdb_path = param_space.pdb_file_path
-    #output_pdb_path = os.path.join(param_space.results_dir, "atom_mapping.pdb")
-    #graph_constructor.write_selected_atoms_to_pdb(input_pdb_file=input_pdb_path, output_pdb_file=output_pdb_path)
-
-    #print(f"Atom mapping saved to {output_pdb_path}")
-
-# Run the graph processing function
 process_graphs(param_space)
 
 print(f'\nTime constructing graphs: {round(time.time() - time_gc, 2)} s')
@@ -120,13 +99,10 @@ def process_graph_files(results_dir):
         if filename.endswith('.json') and filename.startswith('graph_cutoff_'):
             # Construct the full path to the JSON file
             json_path = os.path.join(results_dir, filename)
-            
             # Load the graph and atom mapping
             graph, atom_mapping = ReadFiles().load_graph_and_mapping(json_path)
-            
             # Initialize NetworkParameters
             network_parameters = NetworkParameters(G=graph, atom_mapping=atom_mapping)
-            
             # Define output file names based on the JSON file prefix
             prefix = filename.replace('.json', '')
             shortest_paths_file = os.path.join(results_dir, f"{prefix}_shortest_paths.txt")
@@ -137,42 +113,18 @@ def process_graph_files(results_dir):
             top_nodes_file = os.path.join(results_dir, f"{prefix}_top_10_percent_nodes.txt")
             top_shortest_paths_file = os.path.join(results_dir, f"{prefix}_top_10_shortest_paths.txt")
             lengths_file = os.path.join(results_dir, f"{prefix}_shortest_path_lengths.txt")
-            # Compute shortest paths and save them
-            
-            #compute_shortest_paths(self, all_paths_file, lengths_file, top_file, num_processes=32)
-            # Save shortest paths with labels and create heatmap
-            #network_parameters.save_paths_and_create_heatmap(
-            #    shortest_path_lengths=shortest_paths,
-            #    output_file=shortest_paths_with_labels_file,
-            #    heatmap_file=heatmap_file,
-            #    title=prefix,
-            #    cbar_label="Shortest Path Length"
-            
-            #shortest_paths = network_parameters.compute_shortest_paths(shortest_paths_file,lengths_file,top_shortest_paths_file)
             shortest_paths = network_parameters.compute_shortest_paths(shortest_paths_file,            # File for all shortest paths
                 top_shortest_paths_file,           # File for the top 10 (or 50) shortest paths
                 num_processes=32)
-            #network_parameters.save_paths_and_create_heatmap(shortest_paths, heatmap_file, "Shortest Paths", "Path Length")
             network_parameters.save_paths_and_create_heatmap(shortest_path_lengths=shortest_paths,       # The dictionary with shortest path lengths
             heatmap_file=os.path.join(results_dir, f"{prefix}_shortest_paths_heatmap.png"),  # Heatmap file path
             title="Shortest Paths Heatmap",cbar_label="Path Length")
-
-            #network_parameters.write_top_shortest_paths(shortest_paths,top_shortest_paths_file)
             # Calculate and save centralities
             centralities = network_parameters.calculate_centralities()
             network_parameters.save_centrality_measures(centralities, centralities_file)
             edge_betweenness= network_parameters.calculate_edge_betweenness()
             network_parameters.save_edge_betweenness(edge_betweenness, edge_betweenness_file)
-            
-            # Identify top 10% nodes and save them
             network_parameters.identify_top_10_percent_nodes(centralities, top_nodes_file)
-            
-            # Example for finding alternative paths - replace 'source_residue' and 'target_residue' with actual values
-            # Make sure you have valid source and target residues to avoid errors
-            #source_residue = '269'
-            #target_residue = '112'
-            #alternative_paths = network_parameters.find_alternative_paths(source_residue, target_residue)
-            #print(f"Alternative paths for {filename}: {alternative_paths}")
 
 # Assuming param_space.results_dir is defined
 results_dir = param_space.results_dir
@@ -244,7 +196,6 @@ def process_graph_files_for_communities_and_cliques(results_dir, method):
 # Prompt user for the method to use
 #method = input("Select community detection method ('leiden' or 'girvan'): ").strip().lower()
 method = 'leiden'
-# Assuming param_space.results_dir is defined
 results_dir = param_space.results_dir
 process_graph_files_for_communities_and_cliques(results_dir, method)
             
@@ -268,12 +219,8 @@ def generate_pymol_scripts(results_dir):
             json_path = os.path.join(results_dir, filename)
             prefix = filename.replace('.json', '')
             pdb_file = param_space.pdb_file_path
-            #mapped_pdb = os.path.join(results_dir, "atom_mapping.pdb")
-            
             # Load the graph and atom mapping
             graph, atom_mapping = rf.ReadFiles().load_graph_and_mapping(json_path)
-            #print(atom_mapping)
-            
             # Set paths for the corresponding files
             communities_file = os.path.join(results_dir, f"{prefix}_communities_leiden.txt")
             cliques_file = os.path.join(results_dir, f"{prefix}_cliques_filtered.txt")
@@ -286,7 +233,6 @@ def generate_pymol_scripts(results_dir):
             output_pml_communities = os.path.join(results_dir, f"{prefix}_communities.pml")
             output_top_paths = os.path.join(results_dir, f"{prefix}_top_paths.pml")
             top_15_file = os.path.join(results_dir, f"{prefix}_top_10_shortest_paths.txt")
-            #users/sbheemir/August_2024/results/1kb4/graph_cutoff_5_top_10_shortest_paths.txt
             
             # Initialize PyMOLVisualizer
             visualizer = PyMOLVisualizer(pdb_file=pdb_file, atom_mapping=atom_mapping, graph=graph)

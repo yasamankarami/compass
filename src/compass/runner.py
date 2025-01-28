@@ -104,25 +104,3 @@ def runner():
     print(
         f'Until pymol scripts generation: {round(time.time() - first_timer, 2)} s')
     print(f"Normal Termination")
-
-# =============================================================================
-# Debugging Area (to be removed)
-# =============================================================================
-# import mdtraj as md
-# topology = '/home/rglez/RoyHub/compass/data/MDs/nucleosome_full_2c/1kx5_dry.pdb'
-# trajectory = '/home/rglez/RoyHub/compass/data/MDs/nucleosome_full_2c/nuc-prot-trim.dcd'
-# trajectory = md.load(trajectory, top=topology)
-#
-# ca_atoms = trajectory.topology.select("name CA")
-#
-# # Select C5' as backbone atoms of the nucleic acids
-# dna = "(resname =~ '(5|3)?D([ATGC]){1}(3|5)?$')"
-# rna = "(resname =~ '(3|5)?R?([AUGC]){1}(3|5)?$')"
-# p_atoms = trajectory.topology.select(f'name "C5\'"')
-#
-# p_atoms = trajectory.topology.select(f'({dna} or {rna}) and name "C5\'"')
-# nucleic = trajectory.topology.select(f'({dna} or {rna})')
-#
-# p_atoms.size
-# trajectory.n_residues
-# trajectory.n_atoms
