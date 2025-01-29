@@ -37,31 +37,18 @@ class ReadFiles:
         topology = trajectory.topology
         
         ca_atoms = trajectory.topology.select('name CA')
-        #print(len(ca_atoms), type(ca_atoms))        
         dna = "(resname =~ '(5|3)?D([ATGC]){1}(3|5)?$')"
         rna = "(resname =~ '(3|5)?R?([AUGC]){1}(3|5)?$')"
-        p_o_atoms = topology.select(f'({dna} or {rna}) and name P or name "O5\'"')
-        #print(len(p_o_atoms),p_o_atoms)
-  
-        # Identify elements to remove (those where element + 3 is also in the set)
-        to_remove = set()
-        for index in p_o_atoms:
-            if (index + 3) in p_o_atoms:
-                to_remove.add(index + 3)
-
-        # Remove the identified elements from the set
-        final_p_o_atoms = [index for index in p_o_atoms if index not in to_remove]
-        all_atoms = np.concatenate((ca_atoms, final_p_o_atoms))
-        
+        p_atoms = trajectory.topology.select(f'({dna} or {rna}) and name "C5\'"')
+        all_atoms = sorted(np.concatenate((ca_atoms, p_atoms)))
+    
         atom_mapping = {}  # Maps node index to atom information
         atoms = []
         index_counter = 0
-        print(len(all_atoms), all_atoms)
-        
+    
         amino_acid_count = 0
         nucleic_acid_count = 0
-        missing_residues = []  # Use a set to avoid duplicates
-        
+    
         # Process selected atoms to build atom_mapping
         for atom_index in all_atoms:
             atom = topology.atom(atom_index)
@@ -70,26 +57,21 @@ class ReadFiles:
             residue_name = residue.name
             residue_id = residue.resSeq
             atom_name = atom.name
-
-            residue_key = (residue_name, residue_id, chain_id)
-
+        
             if atom_name == 'CA':
                 amino_acid_count += 1
-                atoms.append((residue_name, atom_name, residue_id, chain_id))
-                atom_mapping[index_counter] = (residue_name, atom_name, residue_id, chain_id)
-                index_counter += 1
-
-            elif atom_name == 'P' or atom_name == "O5'":
+            elif atom_name == "C5'":
                 nucleic_acid_count += 1
-                atoms.append((residue_name, atom_name, residue_id, chain_id))
-                atom_mapping[index_counter] = (residue_name, atom_name, residue_id, chain_id)
-                index_counter += 1
+            
+            atoms.append((residue_name, atom_name, residue_id, chain_id))
+            atom_mapping[index_counter] = (residue_name, atom_name, residue_id, chain_id)
+            index_counter += 1
 
-
-        print(f"Number of amino acid residues processed: {amino_acid_count}")
-        print(f"Number of nucleic acid residues processed: {nucleic_acid_count}")
-        print(f"Number of atoms extracted: {len(atoms)}")
-        print(f"Residues missing 'P' and having 'O5\'': {sorted(missing_residues)}")
+        print(f" 🔍  Processing matrices for graph construction")
+        print(f" 📦  Processed {amino_acid_count} amino acid residues.")
+        print(f" 🧬  Processed {nucleic_acid_count} nucleic acid residues.")
+        print(f" ⚙️   Total residues processed: {len(atoms)}.")
+        print(f" 🕸️  Graph network construction is complete.")
         return atom_mapping, atoms
 
     def parse_mapping(atom_mapping):
@@ -128,45 +110,86 @@ class ReadFiles:
         
     def read_centrality_from_file(file_path):
         """
-        Reads centrality values from a file.
+        Processes a file containing node metrics.
 
         Args:
-            file_path (str): Path to the file containing centrality values.
+            file_path (str): Path to the input file.
 
         Returns:
-            dict: A dictionary mapping node indices to centrality values.
+            pd.DataFrame: A DataFrame containing parsed node metrics.
         """
-        centrality = {}
+        data = []
+        
         with open(file_path, 'r') as f:
-            # Skip the header line
-            next(f)
             for line in f:
-                parts = line.strip().split()
-                #print(parts)
-                if len(parts) == 4:
-                    node, betweenness, closeness, degree = parts
-                    centrality[int(node)] = float(closeness)  # Save the third value (closeness) as centrality
-        return centrality
+                line = line.strip()
+            
+                # Skip empty lines or headers
+                if not line or line.startswith("Node Res_num Chain_ID"):
+                    continue
+                
+                try:
+                    # Split the line into components
+                    parts = line.split("\t")
+                    # Parse the Node column (e.g., "Node (1,A)")
+                    node_info = parts[0].split(" ")
+                    node_details = node_info[1].strip("()").split(",")
+                    #print(node_details)
+                    node_res_num = int(node_details[0])  # Extract residue number
+                    chain_id = node_details[1]          # Extract chain ID
+                    # Parse the remaining columns
+                    betweenness = float(parts[1])
+                    closeness = float(parts[2])
+                    degree = int(parts[3])
+                    # Append to the data list
+                    data.append({
+                        "Node_Res_Num": node_res_num,
+                        "Chain_ID": chain_id,
+                        "Betweenness": betweenness,
+                        "Closeness": closeness,
+                        "Degree": degree
+                    })
+                except (ValueError, IndexError) as e:
+                    print(f"Skipping line due to parsing error: {line} ({e})")
+    
+       
+        # Convert data to a Pandas DataFrame for further analysis
+        df = pd.DataFrame(data)
+        return df
 
     def read_edge_betweenness_from_file(file_path):
-        """
-        Reads edge betweenness values from a file.
-    
-        Args:
-            file_path (str): Path to the file containing edge betweenness values.
-
-        Returns:
-            dict: A dictionary mapping edge tuples to betweenness values.
-        """
-        edge_betweenness = {}
+        edges = []
         with open(file_path, 'r') as f:
-            # Skip the header line
-            next(f)
             for line in f:
-                parts = line.strip().split()
-                if len(parts) == 2:  # Edge and betweenness value
-                    edge_str, value = parts
-                    node1, node2 = map(int, edge_str.split('-'))
-                    edge_betweenness[(node1, node2)] = float(value)
-        return edge_betweenness
+                line = line.strip()
+                # Skip empty lines or headers
+                if not line or line.startswith("Edge"):
+                    continue
+                try:
+                    # Split the line into edge and betweenness
+                    parts = line.split("\t")
+                    # Parse the edge column (e.g., "(1,A)-(2,A)")
+                    edge_info = parts[0].strip("()").split(")-(")
+                    node1 = edge_info[0].strip("()")
+                    node2 = edge_info[1].strip("()")
+                    # Extract residue numbers and chain IDs
+                    res1, chain1 = node1.split(",")
+                    res2, chain2 = node2.split(",")
+                    # Parse betweenness
+                    betweenness = float(parts[1])
+                    # Append the data to the list
+                    edges.append({
+                        "Res1": int(res1),
+                        "Chain1": chain1,
+                        "Res2": int(res2),
+                        "Chain2": chain2,
+                        "Betweenness": betweenness
+                    })
+                except (ValueError, IndexError) as e:
+                    print(f"Skipping line due to parsing error: {line} ({e})")
+    
+        # Convert list of edges to DataFrame
+        df = pd.DataFrame(edges)
+        return df
+
 

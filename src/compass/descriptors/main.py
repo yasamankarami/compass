@@ -56,10 +56,11 @@ def compute_descriptors(mini_traj, trajs, arg, resids_to_atoms, resids_to_noh,
                    oxy, nitro, donors, hydros, acceptors)
 
     comp_time = round(time.time() - first_timer, 2)
-    print(f"Until compilation of descriptors-related functions: {comp_time} s")
+    print(f" ⏱️  Until compilation of descriptors-related functions: {comp_time} s")
 
     # Do a first pass to compute most descriptors
     chunks = tt.get_xyz_chunks(trajs, arg.topo, chunk_size=100)
+    #print(np.shape(trajs))
     n_frames = 0
     for chunk in chunks:
         n_frames += chunk.shape[0]
@@ -105,14 +106,15 @@ def compute_descriptors(mini_traj, trajs, arg, resids_to_atoms, resids_to_noh,
     mi, gc = corr.compute_gc_matrix(corr_coords, num_atoms_per_residue=3)
 
     running_time = round(time.time() - first_timer, 2)
-    print(f"Until descriptors computed: {running_time} s")
+    print(f" 📋 System details: number of frames are {n_frames}")
+    print(f" ⏱️  Until descriptors computed: {running_time} s")
     return ave_min_dist, occ_nb, cp, occ_sb, occ_hb, occ_int, mi, gc
 
 
 @njit(parallel=True)
 def get_chunk_info(traj_coords, resids_to_atoms, resids_to_noh, nb_cut, sb_cut,
                    da_cut, ha_cut, dha_cut, calphas, oxy, nitro, donors,
-                   hydros, acceptors, ):
+                   hydros, acceptors ):
     """
     Get the minimum distance between every pair of residues averaged along
     the trajectory
@@ -151,7 +153,7 @@ def get_chunk_info(traj_coords, resids_to_atoms, resids_to_noh, nb_cut, sb_cut,
     pair_sb_sum = np.zeros(n_pairs)
     pair_hb_sum = np.zeros(n_pairs)
     pair_int_sum = np.zeros(n_pairs)
-
+    #print(f" 📋 System details: Number of frames are {n_frames}, number of backbone atoms are {n_resids}")
     # Compute all interactions for each frame in parallel
     for frame in prange(n_frames):
         frame_coords = traj_coords[frame]
@@ -167,9 +169,7 @@ def get_chunk_info(traj_coords, resids_to_atoms, resids_to_noh, nb_cut, sb_cut,
         pair_sb_sum += pair_sb
         pair_hb_sum += pair_hb
         pair_int_sum += pair_int
-
-    return (
-        pair_min_dist_sum, pair_cp_sum, pair_nb_sum, pair_sb_sum, pair_hb_sum,
+    return ( pair_min_dist_sum, pair_cp_sum, pair_nb_sum, pair_sb_sum, pair_hb_sum,
         pair_int_sum)
 
 
@@ -195,6 +195,7 @@ def get_chunk_cp(traj_coords, resids_to_atoms, pair_cp_sum, calphas):
     n_resids = len(resids_to_atoms)
     n_pairs = int(n_resids * (n_resids - 1) / 2)
     n_frames = len(traj_coords)
+    #print(n_resids, n_pairs, n_frames, "get_chunk_cp in main")
 
     # Get the cp in a second pass to avoid RAM issues
     ave_pair_cp = pair_cp_sum / n_frames

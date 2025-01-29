@@ -30,7 +30,7 @@ class GraphConstructor:
         self.distance_cutoffs = distance_cutoffs
         self.reader = rf.ReadFiles()  # Create an instance of ReadFiles
 
-    def build_graph_from_matrices(self, distance_file, adjacency_file, distance_cutoff):
+    def build_graph_from_matrices(self, distance_file, adjacency_file, distance_cutoff,  atom_mapping):
         """
         Builds a graph using distance and adjacency matrices with a specified distance cutoff.
 
@@ -55,20 +55,8 @@ class GraphConstructor:
         # Add edges based on the distance and adjacency matrices
         for i in range(num_nodes):
             for j in range(i + 1, num_nodes):
-                if min_dist_matrix[i, j] < distance_cutoff and adjacency_matrix[i, j] > 0:
+                if min_dist_matrix[i, j] < int(distance_cutoff) and adjacency_matrix[i, j] > 0:
                     G.add_edge(i, j, weight=adjacency_matrix[i, j])
-
-        # Ensure adjacency residues are connected even if adjacency matrix values are zero
-        for i in range(num_nodes):
-            if i > 0:  # Connect i to i-1
-                if (i - 1, i) not in G.edges:
-                    weight = adjacency_matrix[i - 1, i] if adjacency_matrix[i - 1, i] > 0 else 0.5
-                    G.add_edge(i, i - 1, weight=weight)
-            if i < num_nodes - 1:  # Connect i to i+1
-                if (i, i + 1) not in G.edges:
-                    weight = adjacency_matrix[i, i + 1] if adjacency_matrix[i, i + 1] > 0 else 0.5
-                    G.add_edge(i, i + 1, weight=weight)
-
         return G
 
     def save_graph_and_mapping(self, G, atom_mapping, output_file):
@@ -86,7 +74,7 @@ class GraphConstructor:
         }
         with open(output_file, 'w') as f:
             json.dump(data, f)
-        print(f"Graph and atom mapping saved to {output_file}")
+        print(f" 📥  Graph and atom mapping saved to {output_file}")
 
 
     def plot_and_save_histogram(self, G, output_file_prefix):
@@ -108,7 +96,7 @@ class GraphConstructor:
         histogram_file = f"{output_file_prefix}_histogram.png"
         plt.savefig(histogram_file)
         plt.close()
-        print(f"Histogram of edge weights saved to {histogram_file}")
+        print(f" 📈  Histogram of edge weights saved to {histogram_file}")
 
     def ensure_graph_connectivity(self, G):
         """
@@ -121,7 +109,7 @@ class GraphConstructor:
             nx.Graph: The connected graph.
         """
         if not nx.is_connected(G):
-            print("Graph is not connected. Attempting to connect components.")
+            #print("Graph is not connected. Attempting to connect components.")
             components = list(nx.connected_components(G))
             largest_component = max(components, key=len)
             subgraphs = [G.subgraph(component) for component in components]
@@ -132,8 +120,6 @@ class GraphConstructor:
                     G.add_edges_from(
                         [(list(largest_component)[0], list(component)[0])]
                     )
-            print(f"Graph connected with {len(components)} components.")
-
         return G
 
 

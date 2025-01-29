@@ -1,0 +1,12 @@
+Changes yet to be done:
+
+1. Contents of mapping_file.txt
+extract residue number and residue name from Residue_number
+ooutput order: Chain id, residue name, residue number, atom_name, new index 
+2. Matrices: Labels of the graphs
+3. Matrices: x and Y axis: Chain name and residur number as input PDB
+4. Network: File names of all files
+5. Network: Histograms not needed
+6. Network: Problem with optimal paths code
+7. Network: Mapping should be resolved for following files: Centralities.txt, communities.txt, edge_betweenness.txt, shortest_paths.txt, top_5_percent_nodes, top_10_shortest_paths.txt, cliques.txt
+8. Network: remove "Cartoon grey 80" in top paths.pml

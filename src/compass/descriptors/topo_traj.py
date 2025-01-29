@@ -10,7 +10,7 @@ import prody as prd
 from numba import njit
 from numba.typed.typeddict import Dict
 
-
+'''
 def remap_toppology(topo, mini_traj, out_dir):
     """
     Remap the topology of a system to start from residue 1 and chain 'A'
@@ -51,7 +51,7 @@ def remap_toppology(topo, mini_traj, out_dir):
     # Output renumbered pdb
     renum_pdb = topo_pdb_name.replace('_orig.pdb', '_renum.pdb')
     prd.writePDB(renum_pdb, parsed)
-
+'''
 
 def prepare_datastructures(arg, first_timer):
     """
@@ -83,26 +83,30 @@ def prepare_datastructures(arg, first_timer):
     trajs = arg.traj.split()
     mini_traj = next(md.iterload(trajs[0], top=arg.topo, chunk=1))
     full_topo = mini_traj.topology.to_dataframe()[0]
-
+    map_file = join(arg.out_dir, 'mapping_file.txt')
     # Produce mapping files
-    remap_toppology(arg.topo, mini_traj, arg.out_dir)
+    #remap_toppology(arg.topo, mini_traj, arg.out_dir)
 
     # Indices of residues in the load trajectory and equivalence
     resids_to_atoms, resids_to_noh, internal_equiv = \
         get_resids_indices(mini_traj)
+    #print(resids_to_atoms, "resids_to_atoms in topo_traj")
     raw = {y: x for x in resids_to_atoms for y in resids_to_atoms[x]}
     atoms_to_resids = pydict_to_numbadict(raw)
-
+    
     # Atom selections indices for descriptors calculation
-    calphas = get_calpha_p_indices(mini_traj, atoms_to_resids)
+    calphas = get_calpha_p_indices(mini_traj, atoms_to_resids, map_file=map_file)
     oxy, nitro = get_sb_indices(full_topo, atoms_to_resids)
     donors, hydros, acceptors = \
         get_dha_indices(mini_traj, arg.heavies, atoms_to_resids)
-    corr_indices_raw = get_calpha_p_indices(mini_traj, atoms_to_resids,
+    corr_indices_raw = get_calpha_p_indices(mini_traj, atoms_to_resids,map_file=map_file,
                                             numba=False).keys()
     corr_indices = list(corr_indices_raw)
+    
     prep_time = round(time.time() - first_timer, 2)
-    print(f"Until datastructures prepared: {prep_time} s")
+    print(f" 📋 System details: number of trajectories are {len(trajs)}")
+    print(f" 📋 System details: number of backbone atoms are {len(calphas)}")
+    print(f" ⏱️  Until datastructures prepared: {prep_time} s")
 
     return (
         mini_traj, trajs, resids_to_atoms, resids_to_noh, calphas, oxy, nitro,
@@ -126,7 +130,64 @@ def get_xyz_chunks(trajs, topo, chunk_size=500):
         for chunk in chunks:
             yield chunk.xyz
 
-
+def get_resids_indices(trajectory):
+    """
+    Get indices of residues in the loaded trajectory, properly handling protein and nucleic acid residues
+    while excluding ions and other non-residue atoms.
+    
+    Args:
+        trajectory: trajectory loaded in mdtraj format
+    Returns:
+        res_ind_numba: numba Dict of each residue's all atoms indices
+        res_ind_noh_numba: numba Dict of each residue's non-hydrogen atom indices
+        babel_dict: the equivalence between the original resid numbering and
+                   the 0-based numbering used internally
+    """
+    # Parse the topological information
+    df = trajectory.topology.to_dataframe()[0]
+    
+    # Select CA as backbone atoms of the protein
+    ca_atoms = trajectory.topology.select("name CA")
+    
+    # Select C5' as backbone atoms of the nucleic acids
+    dna = "(resname =~ '(5|3)?D([ATGC]){1}(3|5)?$')"
+    rna = "(resname =~ '(3|5)?R?([AUGC]){1}(3|5)?$')"
+    p_atoms = trajectory.topology.select(f'({dna} or {rna}) and name "C5\'"')
+    all_atoms = sorted(np.concatenate((ca_atoms, p_atoms)))
+    res_names = [trajectory.topology.atom(i).residue.name for i in all_atoms]
+    unique_res_names = np.unique(res_names)
+    #print(unique_res_names)
+    
+    # Create a mask for valid residues (proteins and nucleic acids)
+    valid_residues_mask = df['resName'].isin(unique_res_names)
+    
+    # Filter the dataframe to include only valid residues
+    df_filtered = df[valid_residues_mask]
+    #print(df_filtered[:-10],"printing df in topo_traj")
+    
+    # Group by chain, residue number, and segment for valid residues only
+    group_by_index = df_filtered.groupby(["chainID", "resSeq", "segmentID"]).indices
+    
+    # Create non-hydrogen version
+    group_by_index_noh = {}
+    for key in group_by_index:
+        values = group_by_index[key]
+        noh = values[df_filtered.loc[values, "element"] != "H"]
+        group_by_index_noh[key] = noh
+    
+    # Create babel dictionaries
+    babel_dict = {i: x for i, x in enumerate(group_by_index)}
+    
+    # Transform to zero-based indices dictionaries
+    res_ind_zero = {i: group_by_index[x] for i, x in enumerate(group_by_index)}
+    res_ind_noh = {i: group_by_index_noh[x] for i, x in enumerate(group_by_index_noh)}
+    
+    # Convert to numba dictionaries
+    res_ind_numba = pydict_to_numbadict(res_ind_zero)
+    res_ind_noh_numba = pydict_to_numbadict(res_ind_noh)
+    
+    return res_ind_numba, res_ind_noh_numba, babel_dict
+'''
 def get_resids_indices(trajectory):
     """
     Get indices of residues in the load trajectory
@@ -141,7 +202,6 @@ def get_resids_indices(trajectory):
     """
     # Parse the topological information
     df = trajectory.topology.to_dataframe()[0]
-
     group_by_index = df.groupby(["chainID", "resSeq", "segmentID"]).indices
     group_by_index_noh = {}
     for key in group_by_index:
@@ -161,8 +221,8 @@ def get_resids_indices(trajectory):
     res_ind_noh_numba = pydict_to_numbadict(res_ind_noh)
     return res_ind_numba, res_ind_noh_numba, babel_dict
 
-
-def get_corr_indices(trajectory):
+'''
+def get_corr_indices(trajectory, map_file):
     """
     Get atomic indices for correlation calculation
 
@@ -180,11 +240,22 @@ def get_corr_indices(trajectory):
     dna = "(resname =~ '(5|3)?D([ATGC]){1}(3|5)?$')"
     rna = "(resname =~ '(3|5)?R?([AUGC]){1}(3|5)?$')"
     p_atoms = trajectory.topology.select(f'({dna} or {rna}) and name "C5\'"')
+    #all_atoms = (np.concatenate((ca_atoms, p_atoms)))
     all_atoms = sorted(np.concatenate((ca_atoms, p_atoms)))
+
+    # Write atom details to the specified map_file
+    with open(map_file, 'w') as file:
+        for idx in all_atoms:
+            atom = trajectory.topology.atom(idx)
+
+            # Writing atom details to file
+            file.write(f"Atom Index: {idx}, Atom Name: {atom.name}, "
+                       f"Residue Name: {atom.residue.name}, Residue Index: {atom.residue.index}, "
+                       f"Residue Number: {atom.residue}, chain id:{atom.residue.chain.chain_id}\n")
     return np.asarray(all_atoms, dtype=np.int32)
 
 
-def get_calpha_p_indices(trajectory, atoms_to_resids, numba=True):
+def get_calpha_p_indices(trajectory, atoms_to_resids, map_file, numba=True ):
     """
     Get atomic indices for C-alpha atoms
 
@@ -196,8 +267,17 @@ def get_calpha_p_indices(trajectory, atoms_to_resids, numba=True):
     Returns:
         alphas: indices of C-alpha atoms
     """
-    n_resids = len(list(trajectory.topology.residues))
-    calphas_p_raw = get_corr_indices(trajectory)
+    # Select CA as backbone atoms of the protein
+    ca_atoms = trajectory.topology.select("name CA")
+
+    # Select C5' as backbone atoms of the nucleic acids
+    dna = "(resname =~ '(5|3)?D([ATGC]){1}(3|5)?$')"
+    rna = "(resname =~ '(3|5)?R?([AUGC]){1}(3|5)?$')"
+    p_atoms = trajectory.topology.select(f'({dna} or {rna}) and name "C5\'"')
+    all_atoms = (np.concatenate((ca_atoms, p_atoms)))
+    n_resids = len(all_atoms)
+    calphas_p_raw = get_corr_indices(trajectory, map_file)
+    #print(np.shape(calphas_p_raw),n_resids)
     calphas_p = {i: atoms_to_resids[calphas_p_raw[i]] for i in range(n_resids)}
 
     if len(calphas_p) != n_resids:
