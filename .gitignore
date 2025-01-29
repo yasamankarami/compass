@@ -53,3 +53,4 @@ MANIFEST
 .conda*/
 .python-version
 !example/*
+example/sample_output/network/graph_cutoff_5_shortest_paths.txt
