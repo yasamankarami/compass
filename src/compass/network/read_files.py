@@ -37,11 +37,9 @@ class ReadFiles:
         topology = trajectory.topology
         
         ca_atoms = trajectory.topology.select('name CA')
-        #print(len(ca_atoms), type(ca_atoms))        
         dna = "(resname =~ '(5|3)?D([ATGC]){1}(3|5)?$')"
         rna = "(resname =~ '(3|5)?R?([AUGC]){1}(3|5)?$')"
         p_atoms = trajectory.topology.select(f'({dna} or {rna}) and name "C5\'"')
-        #all_atoms = np.concatenate((ca_atoms, c5_atoms))
         all_atoms = sorted(np.concatenate((ca_atoms, p_atoms)))
     
         atom_mapping = {}  # Maps node index to atom information
@@ -74,93 +72,7 @@ class ReadFiles:
         print(f" 🧬  Processed {nucleic_acid_count} nucleic acid residues.")
         print(f" ⚙️   Total residues processed: {len(atoms)}.")
         print(f" 🕸️  Graph network construction is complete.")
-        #print(atom_mapping)
         return atom_mapping, atoms
-    '''
-    def atom_mapping(self, file_path):
-        """
-        Reads a structure file (PDB) and extracts CA atoms for amino acids and P or O5' atoms for nucleic acids.
-
-        Args:
-            file_path (str): Path to the PDB file.
-
-        Returns:
-            tuple: A tuple containing:
-                - atom_mapping (dict): Mapping of atom indices to atom information.
-                - atoms (list): List of atom objects.
-        """
-        # Initialize output lists and counter
-        atom_mapping = {}  # Maps node index to atom information
-        atoms = []
-        index_counter = 0
-        
-        amino_acid_count = 0
-        nucleic_acid_count = 0
-        missing_residues = set()  # To track missing residues if any
-
-        # Define standard amino acids and nucleotides
-        amino_acids = {'ALA', 'ARG', 'ASN', 'ASP', 'CYS', 'GLN', 'GLU', 'GLY', 
-                       'HIS', 'ILE', 'LEU', 'LYS', 'MET', 'PHE', 'PRO', 'SER', 
-                       'THR', 'TRP', 'TYR', 'VAL'}
-        nucleotides = {'A', 'T', 'C', 'G', 'U', 'DA', 'DT', 'DC', 'DG', 'DA5', 'DA3', 'DT5', 'DT3', 'DC5', 'DC3', 'DG5', 'DG3'}
-
-        residue_atoms = {}  # Temporary storage for atoms in the current residue
-
-        with open(file_path) as file:
-            for line in file.readlines():
-                if line.startswith('ATOM'):
-                    residue_name = line[17:21].strip()
-                    atom_name = line[12:16].strip()
-                    chain_id = line[21].strip()
-                    residue_id = int(line[22:26].strip())
-                    
-                    # Create a unique key for each residue
-                    residue_key = (residue_name, residue_id, chain_id)
-                    
-                    # Collect atoms for the current residue
-                    if residue_key not in residue_atoms:
-                        residue_atoms[residue_key] = set()
-                    residue_atoms[residue_key].add(atom_name)
-
-                    # Processing based on residue type
-                    if residue_name in amino_acids:
-                        if atom_name == 'CA':
-                            atoms.append((residue_name, atom_name, residue_id, chain_id))
-                            atom_mapping[index_counter] = (residue_name, 'CA', residue_id, chain_id)
-                            index_counter += 1
-                            amino_acid_count += 1
-                    elif residue_name in nucleotides:
-                        if atom_name == 'P':
-                            atoms.append((residue_name, atom_name, residue_id, chain_id))
-                            atom_mapping[index_counter] = (residue_name, 'P', residue_id, chain_id)
-                            index_counter += 1
-                            nucleic_acid_count += 1
-                        elif atom_name == "O5'":
-                            if not any(atom_mapping.get(idx)[1] == 'P' for idx in atom_mapping if atom_mapping[idx][2] == residue_id and atom_mapping[idx][3] == chain_id):
-                                atoms.append((residue_name, atom_name, residue_id, chain_id))
-                                atom_mapping[index_counter] = (residue_name, "O5'", residue_id, chain_id)
-                                index_counter += 1
-                                nucleic_acid_count += 1
-
-        # Now process non-standard residues that might have C, CA, and N atoms
-        for residue_key, atom_set in residue_atoms.items():
-            residue_name, residue_id, chain_id = residue_key
-            if residue_name not in amino_acids and residue_name not in nucleotides:
-                if {'C', 'CA', 'N'}.issubset(atom_set):
-                    print(f"Non-standard residue {residue_name} detected with C, CA, and N atoms. Considering it as an amino acid.")
-                    atoms.append((residue_name, 'CA', residue_id, chain_id))
-                    atom_mapping[index_counter] = (residue_name, 'CA', residue_id, chain_id)
-                    index_counter += 1
-                else:
-                    missing_residues.add(residue_key)
-
-        print(f"Number of amino acid residues processed: {amino_acid_count}")
-        print(f"Number of nucleic acid residues processed: {nucleic_acid_count}")
-        print(f"Number of atoms extracted: {len(atoms)}")
-        print(f"Residues missing 'P' and 'O5\': {sorted(missing_residues)}")
-        #print(atom_mapping)
-        return atom_mapping, atoms
-    '''
 
     def parse_mapping(atom_mapping):
         """
@@ -219,19 +131,16 @@ class ReadFiles:
                 try:
                     # Split the line into components
                     parts = line.split("\t")
-                    
                     # Parse the Node column (e.g., "Node (1,A)")
                     node_info = parts[0].split(" ")
                     node_details = node_info[1].strip("()").split(",")
                     #print(node_details)
                     node_res_num = int(node_details[0])  # Extract residue number
                     chain_id = node_details[1]          # Extract chain ID
-    
                     # Parse the remaining columns
                     betweenness = float(parts[1])
                     closeness = float(parts[2])
                     degree = int(parts[3])
-
                     # Append to the data list
                     data.append({
                         "Node_Res_Num": node_res_num,
@@ -250,31 +159,24 @@ class ReadFiles:
 
     def read_edge_betweenness_from_file(file_path):
         edges = []
-    
         with open(file_path, 'r') as f:
             for line in f:
                 line = line.strip()
-            
                 # Skip empty lines or headers
                 if not line or line.startswith("Edge"):
                     continue
-            
                 try:
                     # Split the line into edge and betweenness
                     parts = line.split("\t")
-                
                     # Parse the edge column (e.g., "(1,A)-(2,A)")
                     edge_info = parts[0].strip("()").split(")-(")
                     node1 = edge_info[0].strip("()")
                     node2 = edge_info[1].strip("()")
-                    
                     # Extract residue numbers and chain IDs
                     res1, chain1 = node1.split(",")
                     res2, chain2 = node2.split(",")
-                
                     # Parse betweenness
                     betweenness = float(parts[1])
-                
                     # Append the data to the list
                     edges.append({
                         "Res1": int(res1),

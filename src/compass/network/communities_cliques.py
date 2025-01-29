@@ -94,12 +94,10 @@ class CommunityDetector:
         try:
             # First, organize communities by community index
             community_groups = self._collect_members_partition(self, communities)
-            #print(community_groups)
             with open(output_file, 'w') as f:
                 f.write(f"Communities file. This file contains the community members information in the order chain_id residue_number\n")
                 for comm_idx, members in sorted(community_groups.items()):
                     members_str = ', '.join(map(str, members))
-                    #print(self.atom_mapping.keys())
                     f.write(f"Community {comm_idx}: {members_str}\n")
             print(f" 🧩  Communities saved to {output_file}")
         except Exception as e:
@@ -152,8 +150,6 @@ class CliqueDetector:
 
             clique_dict = self._collect_members_cliques(selected_cliques)
             
-            #print(f"Detected {len(clique)} cliques.")
-            #print(clique_dict)
             return clique_dict
         except Exception as e:
             print(f"Error detecting cliques: {e}")

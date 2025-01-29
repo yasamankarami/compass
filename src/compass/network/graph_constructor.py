@@ -48,7 +48,6 @@ class GraphConstructor:
 
         G = nx.Graph()
         num_nodes = len(min_dist_matrix)
-        #print("number of nodes", num_nodes)
 
         for i in range(num_nodes):
             G.add_node(i)
@@ -56,25 +55,8 @@ class GraphConstructor:
         # Add edges based on the distance and adjacency matrices
         for i in range(num_nodes):
             for j in range(i + 1, num_nodes):
-                #print(min_dist_matrix[i, j], type(distance_cutoff), adjacency_matrix[i, j])
                 if min_dist_matrix[i, j] < int(distance_cutoff) and adjacency_matrix[i, j] > 0:
                     G.add_edge(i, j, weight=adjacency_matrix[i, j])
-                    #print(i,j,adjacency_matrix[i, j],min_dist_matrix[i,j], atom_mapping[i], atom_mapping[j])
-
-        # Ensure adjacency residues are connected even if adjacency matrix values are zero
-        '''
-        for i in range(num_nodes):
-            if i > 0:  # Connect i to i-1
-                if (i - 1, i) not in G.edges:
-                    weight = adjacency_matrix[i - 1, i] if adjacency_matrix[i - 1, i] > 0 else 0.5
-                    G.add_edge(i, i - 1, weight=weight)
-            if i < num_nodes - 1:  # Connect i to i+1
-                if (i, i + 1) not in G.edges:
-                    weight = adjacency_matrix[i, i + 1] if adjacency_matrix[i, i + 1] > 0 else 0.5
-                    G.add_edge(i, i + 1, weight=weight)
-        print("num of edges", G.number_of_edges())
-        '''
-
         return G
 
     def save_graph_and_mapping(self, G, atom_mapping, output_file):
@@ -138,8 +120,6 @@ class GraphConstructor:
                     G.add_edges_from(
                         [(list(largest_component)[0], list(component)[0])]
                     )
-            #print(f"Graph connected with {len(components)} components.")
-
         return G
 
 

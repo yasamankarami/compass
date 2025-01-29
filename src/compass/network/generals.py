@@ -18,21 +18,16 @@ def process_graphs(param_space, distance_cutoffs):
         param_space (Namespace): An object containing file paths and directories.
         distance_cutoffs (list, optional): List of distance cutoffs to use. If None, a default list is used.
     """
-
-    #atom_mapping, _ = graph_constructor.reader.atom_mapping(param_space.pdb_file_path)
     # Initialize GraphConstructor
-    
     graph_constructor = GraphConstructor(
         distance_file=param_space.min_dist_matrix_file,
         adjacency_file=param_space.adjacency_file,
         distance_cutoffs=distance_cutoffs
     )
     atom_mapping, _ = graph_constructor.reader.atom_mapping(param_space.pdb_file_path)
-    #print(atom_mapping)
-    
+
     # Iterate over each distance cutoff to build and process the graph
     for distance_cutoff in graph_constructor.distance_cutoffs:
-        #print("first dist", distance_cutoff)
         start_time = time.time()
         # Generate atom mapping before saving the graph
         # Build the graph
@@ -43,8 +38,6 @@ def process_graphs(param_space, distance_cutoffs):
             atom_mapping = atom_mapping)
         # Ensure graph connectivity
         G = graph_constructor.ensure_graph_connectivity(G)
-        # Generate atom mapping before saving the graph
-        #print(atom_mapping)
         # Define file names based on the distance cutoff
         graph_filename = f"graph_cutoff_{distance_cutoff}.json"
         output_graph_file = os.path.join(param_space.network_dir, graph_filename)
@@ -54,8 +47,6 @@ def process_graphs(param_space, distance_cutoffs):
         output_file_prefix = os.path.join(param_space.network_dir, f"graph_cutoff_{distance_cutoff}")
         graph_constructor.plot_and_save_histogram(G, output_file_prefix=output_file_prefix)
         print(f" 🖥️  Processed graph for cutoff {distance_cutoff} in {round(time.time() - start_time, 2)} seconds")
-
-
 
 def process_graph_files(results_dir, dist_cutoff_graph):
     """
@@ -69,13 +60,10 @@ def process_graph_files(results_dir, dist_cutoff_graph):
         if filename.endswith('.json') and filename.startswith('graph_cutoff_'+ dist_cutoff_graph):
             # Construct the full path to the JSON file
             json_path = os.path.join(results_dir, filename)
-
             # Load the graph and atom mapping
             graph, atom_mapping = ReadFiles().load_graph_and_mapping(json_path)
-
             # Initialize NetworkParameters
             network_parameters = NetworkParameters(G=graph,atom_mapping=atom_mapping)
-
             # Define output file names based on the JSON file prefix
             prefix = filename.replace('.json', '')
             shortest_paths_file = os.path.join(results_dir,f"{prefix}_shortest_paths.txt")
@@ -87,22 +75,15 @@ def process_graph_files(results_dir, dist_cutoff_graph):
             top_shortest_paths_file = os.path.join(results_dir,f"{prefix}_top_10_shortest_paths.txt")
             lengths_file = os.path.join(results_dir,f"{prefix}_shortest_path_lengths.txt")
 
-            # shortest_paths = network_parameters.compute_shortest_paths(shortest_paths_file,lengths_file,top_shortest_paths_file)
             shortest_paths = network_parameters.compute_shortest_paths(shortest_paths_file,  # File for all shortest paths
                 top_shortest_paths_file)
-
             centralities = network_parameters.calculate_centralities()
             network_parameters.save_centrality_measures(centralities,centralities_file)
             edge_betweenness = network_parameters.calculate_edge_betweenness()
             network_parameters.save_edge_betweenness(edge_betweenness,edge_betweenness_file)
             # Identify top 10% nodes and save them
             network_parameters.identify_top_10_percent_nodes(centralities,top_nodes_file)
-            # Example for finding alternative paths - replace 'source_residue' and 'target_residue' with actual values
-            # Make sure you have valid source and target residues to avoid errors
-            #source_residue = '136'
-            #target_residue = '329'
-            #alternative_paths = network_parameters.find_alternative_paths(source_residue, target_residue)
-            #print(f"Alternative paths for {filename}: {alternative_paths}")
+
 
 def find_paths( pdb_file, results_dir, dist_cutoff_graph, source_res,target_res):
     for filename in os.listdir(results_dir):
@@ -118,7 +99,6 @@ def find_paths( pdb_file, results_dir, dist_cutoff_graph, source_res,target_res)
             prefix = filename.replace('.json', '')
             alt_paths_file = os.path.join(results_dir,f"{prefix}_alt_paths.txt")
             network_parameters.find_alternative_paths(source_res, target_res, alt_paths_file )
-            #print(alternative_paths)
             output_pml_file = os.path.join(results_dir,f"{prefix}_alt_paths.pml")
             if os.path.exists(alt_paths_file):
                 visualizer.write_pml_script_for_alternative_paths(alt_paths_file,output_pml_file)
@@ -142,8 +122,6 @@ def process_graph_files_for_communities_and_cliques(results_dir, dist_cutoff_gra
             json_path = os.path.join(results_dir, filename)
             graph, atom_mapping = ReadFiles().load_graph_and_mapping(json_path)
             # Load the graph and atom mapping
-            #with open(json_path, 'r') as f:data = json.load(f)
-            #G = graph
             # Initialize CommunityDetector and CliqueDetector
             community_detector = CommunityDetector(G=graph, atom_mapping = atom_mapping)
             # Define output file names based on the JSON file prefix
@@ -160,9 +138,6 @@ def process_graph_files_for_communities_and_cliques(results_dir, dist_cutoff_gra
             # Construct the full path to the JSON file
             json_path = os.path.join(results_dir, filename)
             graph, atom_mapping = ReadFiles().load_graph_and_mapping(json_path)
-            # Load the graph and atom mapping
-            #with open(json_path, 'r') as f:data = json.load(f)
-            #G = graph
             # Initialize CliqueDetector
             clique_detector = CliqueDetector(G= graph, atom_mapping = atom_mapping )
             # Define output file names based on the JSON file prefix
@@ -185,12 +160,8 @@ def generate_pymol_scripts(results_dir, pdb_file, dist_cutoff_graph, dist_cutoff
         if filename.endswith('.json') and filename.startswith('graph_cutoff_'+dist_cutoff_graph):
             json_path = os.path.join(results_dir, filename)
             prefix = filename.replace('.json', '')
-            # mapped_pdb = os.path.join(results_dir, "atom_mapping.pdb")
-
             # Load the graph and atom mapping
             graph, atom_mapping = ReadFiles().load_graph_and_mapping(json_path)
-            # print(atom_mapping)
-
             # Set paths for the corresponding files
             communities_file = os.path.join(results_dir,f"{prefix}_communities_leiden.txt")
             centrality_file = os.path.join(results_dir,f"{prefix}_centralities.txt")

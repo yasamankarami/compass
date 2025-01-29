@@ -71,7 +71,6 @@ class NetworkParameters:
         collected_paths = self._collect_paths_until_threshold(
             nodes, shortest_paths, path_lengths
         )
-        #print(len(shortest_paths),"shortest_paths", print(len(collected_paths),"collected paths"))
         # Save results to files
         self._save_paths(all_paths_file, top_file, collected_paths, shortest_paths)
         
@@ -98,8 +97,6 @@ class NetworkParameters:
             try:
                 # Compute all shortest paths from source in one call
                 distances, paths = nx.single_source_dijkstra(self.G, source, weight='weight')
-                
-                # Store only paths to nodes that come after source in sorted order
                 # This avoids redundant path storage
                 for target in (n for n in nodes if n > source):
                     if target in paths:
@@ -147,8 +144,6 @@ class NetworkParameters:
             unique_residues.update(path)
             
             if len(unique_residues) >= residue_threshold:
-                #print(f"\nReached {len(unique_residues)} residues "
-                #      f"({(len(unique_residues)/total_residues)*100:.2f}% of total)")
                 break
                 
         return collected_paths
@@ -216,9 +211,6 @@ class NetworkParameters:
                         # Write path with node indices
                         path_str = " -> ".join(map(str, path))
                         file.write(f"{source} -> {target}: Length = {length:.2f}, Path = [{path_str}]\n")
-                        #file.write(f"{source} -> {target}: Length = {length:.2f}", f"Path = [{path_str}]\n")
-                        
-
                         # Write path with residue mapping
                         mapped_path = []
                         for node in path:
@@ -275,25 +267,19 @@ class NetworkParameters:
 
         # Replace inf values in the data matrix with 0
         data_matrix[np.isinf(data_matrix)] = 0
-    
         # Determine the minimum and maximum values for the color scale
         vmin = np.min(data_matrix)
         vmax = np.max(data_matrix)
-        #print(vmin, vmax, "minimum and maximum values of heatmap")
-
         # Plot the heatmap
         plt.figure(figsize=(10, 8))
         sns.heatmap(data_matrix, annot=False, fmt=".2f", cmap="viridis", cbar_kws={'label': cbar_label}, vmin=vmin, vmax=vmax)
-        
         # Set titles and labels
         plt.title(title)
         plt.xlabel("Node Index")
         plt.ylabel("Node Index")
-        
         # Save the heatmap to the specified file
         plt.savefig(heatmap_file)
         plt.close()
-
         end_time = time.time()
         print(f"Heatmap created and saved in {end_time - start_time:.2f} seconds")
         
@@ -322,75 +308,7 @@ class NetworkParameters:
             except nx.NetworkXNoPath:
                 continue
         return chunk_paths
-    '''        
-    def find_alternative_paths(self, source_residue, target_residue, alt_paths_file):
-        """
-        Find all paths between two residues, sort by total path weight, and write top 10% to file.
-        
-        Args:
-            source_residue (str): Source residue in format 'res_num:chain_id'
-            target_residue (str): Target residue in format 'res_num:chain_id'
-            alt_paths_file (str): File to write alternative paths
-            max_path_length (int, optional): Maximum path length to consider. Defaults to None.
-        
-        Returns:
-            list: Sorted paths based on total weight
-        """
-        #max_path_length=None
-        # Parse residue identifiers
-        source_res_num, source_chain_id = map(str, source_residue.split(":"))
-        target_res_num, target_chain_id = map(str, target_residue.split(":"))
-        #print(self.G.nodes(),self.atom_mapping.items() )
-        def find_matching_node(res_num, chain_id):
-            for node, attrs in self.atom_mapping.items():
-                #print(node, attrs)
-                # Check if residue number matches (adding 1 to the index)
-                if str(attrs[2]) == str(int(res_num)):
-                    # If chain_id is space or matches exactly
-                    if chain_id.strip() == '' or str(attrs[3]).strip() == chain_id.strip():
-                        return node
-            return None
-        # Find corresponding graph nodes
-        source_node = find_matching_node(source_res_num, source_chain_id)
-        target_node = find_matching_node(target_res_num, target_chain_id)
-        
-        if source_node is None or target_node is None:
-            #print(self.atom_mapping.items(),source_res_num, target_res_num )
-            raise ValueError(f"Could not find nodes for residues {source_node} and {target_node}")
-        # Determine optimal number of processes
-        num_cpus = multiprocessing.cpu_count()
-    
-        # Divide start nodes for parallel processing
-        start_nodes = list(self.G.nodes())
-        chunk_size = math.ceil(len(start_nodes) / num_cpus)
-        node_chunks = [start_nodes[i:i+chunk_size] for i in range(0, len(start_nodes), chunk_size)]
-    
-        with multiprocessing.Pool(processes=num_cpus) as pool:
-            parallel_results = pool.starmap(
-                self.generate_paths_chunk, 
-                [(chunk, source_node, target_node) for chunk in node_chunks]
-        )
-    
-        # Flatten results and remove duplicates
-        all_paths = list(set(itertools.chain.from_iterable(parallel_results)))
-        # Sort paths by total weight    
-        sorted_paths = sorted(all_paths, key=calculate_path_weight)
-        
-        # Calculate top 10% of paths
-        top_paths_count = max(1, int(len(sorted_paths) * 0.1))
-        top_paths = sorted_paths[:top_paths_count]
-        
-        # Write paths to file
-        with open(alt_paths_file, 'w') as f:
-            f.write(f"Total paths found: {len(sorted_paths)}\n")
-            f.write(f"Top {top_paths_count} paths (sorted by weight):\n")
-            for i, path in enumerate(top_paths, 1):
-                path_weight = calculate_path_weight(path)
-                path_str = " -> ".join(map(str, path))
-                f.write(f"Path {i} (Weight: {path_weight}): {path_str}\n")
-    
-        return top_paths
-    '''
+
     def find_alternative_paths(self, source_residue, target_residue, alt_paths_file, k=2):
         """
         Finds the top k alternative paths using Yen's algorithm.
@@ -409,10 +327,6 @@ class NetworkParameters:
 
         node1 = None
         node2 = None
-        #new_dict={}
-        #for node in self.G.nodes():
-        #    res_name, atom_name, res_num, chain_id = self.atom_mapping.get(str(edge[0]), ("Unknown", "Unknown", "Unknown", "Unknown"))
-            
         for key, values in self.atom_mapping.items():
             #print (key, values)
             if values[-2] == int(source_res_num) and values[-1] == source_chain_id:
@@ -421,8 +335,6 @@ class NetworkParameters:
                 node2 = key
             if node1 is not None and node2 is not None:
                 break
-
-        #print(node1, node2, int(source_res_num), int(target_res_num))
         node1, node2 = int(source_res_num), int(target_res_num)
 
         def find_yen_k_paths():
@@ -523,7 +435,6 @@ class NetworkParameters:
         closeness = nx.closeness_centrality(self.G, distance='weight')
         degree = dict(self.G.degree())
         end_time = time.time()
-        #print(f"Centralities calculated in {end_time - start_time:.2f} seconds")
         return betweenness, closeness, degree
 
     def save_centrality_measures(self, centralities, output_file):
@@ -540,11 +451,9 @@ class NetworkParameters:
             f.write("Node Res_num Chain_ID\tBetweenness\tCloseness\tDegree\n")
             for node in betweenness.keys():
                 res_name0, atom_name0, res_num0, chain_id0 = self.atom_mapping.get(str(node), ("Unknown", "Unknown", "Unknown", "Unknown"))
-                #f.write(f"Node {res_num0}, {chain_id0}\n")
                 f.write(f"Node ({res_num0},{chain_id0})\t{betweenness[node]:.4f}\t{closeness[node]:.4f}\t{degree[node]}\n")
         end_time = time.time()
-        #print(f"Centralities saved in {end_time - start_time:.2f} seconds")
-        
+
     def calculate_edge_betweenness(self):
         """
         Calculates edge betweenness centrality for the graph.
@@ -553,16 +462,8 @@ class NetworkParameters:
             dict: A dictionary mapping edges to their betweenness centrality value.
         """
         start_time = time.time()
-        #print(f"Number of nodes: {self.G.number_of_nodes()}")
-        #print(f"Number of edges: {self.G.number_of_edges()}")
-        # Print edges in the graph to cross-check
-        #print(f"Edges in the graph: {list(self.G.edges(data=True))}")
-        #print(self.G)
         edge_betweenness = nx.edge_betweenness_centrality(self.G, weight='weight')
-        #print(self.G.edges())
-        #print(np.max(edge_betweenness), "max edge betweenness")
         end_time = time.time()
-        #print(f"Edge betweenness calculated in {end_time - start_time:.2f} seconds")
         return edge_betweenness
 
     def save_edge_betweenness(self, edge_betweenness, output_file):
@@ -577,20 +478,12 @@ class NetworkParameters:
         with open(output_file, 'w') as f:
             f.write("Edge\tBetweenness\n")
             for edge, centrality in edge_betweenness.items():
-                #print(edge, centrality)
                 if self.G.has_edge(*edge):  # Ensure that only edges in the graph are saved
-                    #for node in path:
                     res_name0, atom_name0, res_num0, chain_id0 = self.atom_mapping.get(str(edge[0]), ("Unknown", "Unknown", "Unknown", "Unknown"))
                     res_name1, atom_name1, res_num1, chain_id1 = self.atom_mapping.get(str(edge[1]), ("Unknown", "Unknown", "Unknown", "Unknown"))
-                    #print(self.atom_mapping())
-                    #print(res_name0, atom_name0, res_num0, chain_id0,"res_name0, atom_name0, res_num0, chain_id0")
                     edge_str = f"({res_num0},{chain_id0})-({res_num1},{chain_id1})"
                     f.write(f"{edge_str}\t{centrality:.4f}\n")
-                # Edge format: (node1, node2)
-                #edge_str = f"{edge[0]}-{edge[1]}"
-                #f.write(f"{edge_str}\t{centrality:.4f}\n")
         end_time = time.time()
-        #print(f"Edge betweenness saved in {end_time - start_time:.2f} seconds")
 
     def identify_top_10_percent_nodes(self, centralities, output_file):
         """
@@ -603,12 +496,10 @@ class NetworkParameters:
         betweenness, closeness, degree = centralities
         num_nodes = len(betweenness)
         top_n = max(1, num_nodes // 20)
-
         # Sorting nodes based on centrality measures
         sorted_betweenness = sorted(betweenness.items(), key=lambda x: x[1], reverse=True)[:top_n]
         sorted_closeness = sorted(closeness.items(), key=lambda x: x[1], reverse=True)[:top_n]
         sorted_degree = sorted(degree.items(), key=lambda x: x[1], reverse=True)[:top_n]
-
         # Merging all top nodes
         top_nodes = set([node for node, _ in sorted_betweenness] +
                         [node for node, _ in sorted_closeness] +

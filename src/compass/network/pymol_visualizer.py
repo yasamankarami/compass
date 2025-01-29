@@ -26,9 +26,6 @@ class PyMOLVisualizer:
         self.pdb_file = pdb_file
         self.atom_mapping = atom_mapping
         self.graph = graph
-
-        #print(self.atom_mapping)
-
     def parse_communities_file(self, communities_file):
         """
         Parses the communities file and returns a dictionary of communities.
@@ -44,15 +41,12 @@ class PyMOLVisualizer:
             for line in f:
                 parts = line.strip().split(':')
                 if len(parts) == 2:
-                    #print('\n',"parts 0",parts[0].split()[1], "parts 1", parts[1])
                     community_idx = parts[0].split()[1]
                     node_list = parts[1].strip()
-                    #nodes = [int(node.strip()) for node in node_list.split(',')]
                     if community_idx not in communities:
                         communities[community_idx] = []
 
                     communities[community_idx].append(node_list)
-            #print(communities)
 
         return communities
 
@@ -104,17 +98,12 @@ class PyMOLVisualizer:
             # Define colors for each community
             for community, color in community_colors.items():
                 f.write(f"set_color color{community}, [{', '.join(map(str, color))}]\n")
-                #print(communities)
-
             # Apply colors to residues based on community assignment
             for community, nodes in communities.items():
-                #print(community, type(community), nodes, type(nodes), len(nodes))
                 color = f"color{community}"
                 nodes = [num for num in nodes[0].split(',')]
                 for node in nodes:
-                    #print(node, node.split('_')[:2])
                     chain_id, res_num = node.split('_')[:2]  # Splitting on '_' and assuming chain_id and res_num are in this format
-                    #print(chain_id, res_num)
                     if chain_id:  # If chain_id is not empty
                         f.write(f"color {color}, chain {chain_id} and resi {res_num}\n")
                     else:  # If there's no chain_id (for standalone residues?)
@@ -145,7 +134,6 @@ class PyMOLVisualizer:
                     continue  # Skip invalid lines
                 clique_idx = int(parts[0].split()[1])  # Extract clique index
                 nodes_list = parts[1].split()  # Clean and convert nodes
-                #print("nodes")
                 cliques[clique_idx] = nodes_list
         
         return cliques
@@ -177,11 +165,8 @@ class PyMOLVisualizer:
                 # Create a selection for this clique
                 selection_residues = []
                 for node in nodes:
-                    #print(node)
                     chain_id, res_num = node.split('_')[:2]
                     res_num = int(res_num.strip().replace(',', ''))
-                    #print(chain_id, res_num, node)
-                    #res_name, atom_name, res_num, chain_id = self.atom_mapping[str(node)]
                     f.write(f"color clique_{i}, chain {chain_id} and resi {res_num}\n")
                     f.write(f"show spheres, chain {chain_id} and resi {res_num} and (name CA or name C5')\n")
                 # Combine all residue selections into one command
@@ -208,19 +193,9 @@ class PyMOLVisualizer:
 
         # Read centrality and edge betweenness from files
         centrality_df = ReadFiles.read_centrality_from_file(centrality_file)
-        #if not centrality:
-        #    print("Warning: No centrality values found in the centrality file.")
-        #print(centrality)
         betweenness_df = ReadFiles.read_edge_betweenness_from_file(edge_betweenness_file)
-        #print(edge_betweenness)
-        #if not edge_betweenness:
-        #    print("Warning: No edge betweenness values found in the edge betweenness file.")
-        #print(betweenness_df)
         output_files = {
             "all": open(f"{output_pml}_all.pml", 'w'),
-            #"ca_ca": open(f"{output_pml}_ca_ca.pml", 'w'),
-            #"ca_other": open(f"{output_pml}_ca_other.pml", 'w'),
-            #"other_other": open(f"{output_pml}_other_other.pml", 'w')
         }
 
         # Write initial structure loading and visualization commands
@@ -235,10 +210,8 @@ class PyMOLVisualizer:
             res_num = row['Node_Res_Num']
             chain_id = row['Chain_ID']
             centrality_value = row['Betweenness']
-            
             norm_centrality = centrality_value / max_centrality
             sphere_scale = 0.3+1 * norm_centrality  # Simplified sphere scale calculation
-
             for file in output_files.values():
                 file.write(f"show spheres, chain {chain_id} and resi {res_num} and (name CA or name C5')\n")
                 file.write(f"set sphere_scale, {sphere_scale:.2f}, chain {chain_id} and resi {res_num} and (name CA or name C5')\n")
@@ -309,10 +282,6 @@ class PyMOLVisualizer:
 
                 # Highlight residues as spheres
                 for res_num, chain_id in residue_info:
-                    #atom_name = "CA" if chain_id.upper() != 'R' else "C5'"  # Example logic for atom name
-                    #if chain_id == "Unknown":
-                        #f.write(f"# Skipping residue {res_num} due to missing chain ID\n")
-                    #    continue
                     f.write(f"select chain {chain_id} and resi {res_num} and (name CA or name C5')\n")
                     f.write(f"show spheres, chain {chain_id} and resi {res_num} and (name CA or name C5')\n")
                     f.write(f"color highlight_color, chain {chain_id} and resi {res_num}\n")
@@ -344,10 +313,8 @@ class PyMOLVisualizer:
             for i in range(len(residue_list) - 1):
                 res1 = residue_list[i]
                 res2 = residue_list[i + 1]
-
                 # Create selection for residues
                 f.write(f"select resi {res1}, resi {res2}\n")
-
                 # Draw distance and hide label
                 f.write(f"distance path_{res1}_{res2}, resi {res1}, resi {res2}\n")
                 f.write(f"set gap_width, 0, path_{res1}_{res2}\n")
@@ -397,16 +364,13 @@ class PyMOLVisualizer:
                 written_selections = set()
                 written_distances = set()
                 written_spheres = set()
-
                 # Load the PDB file
                 f.write(f"load {self.pdb_file}\n")
-
                 # Process paths
                 for path in paths:
                     for i in range(len(path) - 1):
                         node1 = path[i]
                         node2 = path[i + 1]
-
                         # Atom mappings
                         try:
                             res_name1, atom_name1, res_num1, chain_id1 = self.atom_mapping[str(node1)]
@@ -483,8 +447,6 @@ class PyMOLVisualizer:
             edge_betweenness_file (str): Path to the file containing edge betweenness values.
             output_pml_file (str): Path to the output PyMOL script file.
         """
-
-
         # Read paths and mapped paths from the file
         paths = []
         try:
@@ -512,13 +474,11 @@ class PyMOLVisualizer:
             with open(output_pml_file, 'w') as f:
                 # Load the PDB file
                 f.write(f"load {self.pdb_file}\n")
-
                 # Process each path and corresponding residues
                 for path in paths:
                     for i in range(len(path) - 1):
                         res_num1, chain_id1 = path[i]
                         res_num2, chain_id2 = path[i + 1]
-
                         # Write PyMOL commands for selections and visualization
                         f.write(f"select resi_{res_num1}, chain {chain_id1} and resi {res_num1} and (name CA or name C5')\n")
                         f.write(f"select resi_{res_num2}, chain {chain_id2} and resi {res_num2} and (name CA or name C5')\n")
@@ -528,16 +488,12 @@ class PyMOLVisualizer:
                             f"chain {chain_id1} and resi {res_num1} and (name CA or name C5'), "
                             f"chain {chain_id2} and resi {res_num2} and (name CA or name C5')\n"
                         )
-
                 # Finalize the PyMOL script
                 f.write("hide labels \n")
                 f.write("set dash_gap, 0 \n")
                 f.write("set dash_color, grey10 \n")
                 f.write("bg_color white\n")
                 f.write("set sphere_transparency, 0.3 \n")
-
-        #print(f"PyMOL script for alternative paths saved to {output_pml_file}")
-
         except Exception as e:
             print(f"Error writing PyMOL script to file: {e}")
 
