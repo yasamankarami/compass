@@ -35,12 +35,12 @@ def runner():
         raise ValueError(
             '\ncompass syntax is: compass path-to-config-file')
     config_path = sys.argv[1]
-    # config_path = "/home/rglez/RoyHub/compass/example/params.cfg"
+    # config_path = '/home/gonzalezroy/RoyHub/compass/example/params_1kx5.cfg'
     first_timer = time.time()
     arg, dict_arg = cfg.parse_params(config_path)
     #map_file = join(dict_arg["generals"]["output_dir"],'_map_file.txt')
     # Prepare datastructures & containers
-    
+
     (mini_traj, trajs, resids_to_atoms, resids_to_noh, calphas, oxy, nitro,
      donors, hydros, acceptors, corr_indices) = tt.prepare_datastructures(arg, first_timer)
     #print("corr indices",corr_indices)
@@ -68,26 +68,27 @@ def runner():
 
     ## Select the matrices to be used in the PCA
     adj_name = pca.run_pca(arg, matrices, n, first_timer)
-    
+
     # %%=======================================================================
     # 5. Perform network analyses
     # =========================================================================
-    
+
     # Construct graphs
     arg.adjacency_file = adj_name
     arg.min_dist_matrix_file = matrices_names["MINDIST"]
-    
+
     #arg.adjacency_file = '/users/sbheemir/september_2024/results/1kx5/matrices/1kx5_ADJACENCY.mat'
     #arg.min_dist_matrix_file = '/users/sbheemir/september_2024/results/1kx5/matrices/1kx5_MINDIST.mat'
-    arg.pdb_file_path = dict_arg["generals"]["topology"]
+    # arg.pdb_file_path = dict_arg["generals"]["topology"]
+    arg.pdb_file_path = arg.topo
     arg.network_dir = join(dict_arg["generals"]["output_dir"], 'network')
     os.makedirs(arg.network_dir, exist_ok=True)
     dist_cutoffs = [dict_arg["distance cutoffs"]["Graph"],dict_arg["distance cutoffs"]["Cliques"]]
-    
+
     #print(dist_cutoffs)
     gn.process_graphs(arg, dist_cutoffs)
     print(f' ⏳  Until graphs construction: {round(time.time() - first_timer, 2)} s')
-    
+
     # Compute network parameters
     gn.process_graph_files(arg.network_dir,dist_cutoffs[0] )
     # Find alternative paths for a specific graph
@@ -108,7 +109,7 @@ def runner():
     if dict_arg["paths"]["find_path"] == 'True':
         source_residues = dict_arg["paths"]["sources"].split(",")  # Convert comma-separated string to list
         target_residues = dict_arg["paths"]["targets"].split(",")  # Convert comma-separated string to list
-    
+
         for source_residue in source_residues:
             for target_residue in target_residues:
                 #print(f"Finding path between {source_residue} and {target_residue}")
