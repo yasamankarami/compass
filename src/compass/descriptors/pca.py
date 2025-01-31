@@ -6,12 +6,8 @@ from numba import njit, prange
 from numpy import concatenate as concat
 from scipy.sparse import lil_matrix
 from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
-import seaborn as sns
+
 from compass.descriptors import geometry as geom
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
-import numpy as np
 
 
 def reshape_matrices(matrices):
@@ -47,12 +43,12 @@ def perform_pca(data):
         pca_result: PCA result
     """
     pca = PCA(n_components=2)
-    #concatenated_data = np.concatenate(data, axis=0)
-    #scaler = StandardScaler()
-    #standardized_data = scaler.fit_transform(data)
-    #pca_result = pca.fit_transform(data)
+    # concatenated_data = np.concatenate(data, axis=0)
+    # scaler = StandardScaler()
+    # standardized_data = scaler.fit_transform(data)
+    # pca_result = pca.fit_transform(data)
     pca_result = pca.fit_transform(data)
-    #print(pca_result)
+    # print(pca_result)
     return pca_result
 
 
@@ -62,12 +58,12 @@ def calc_chunk_distances(chunk_i, chunk_j, threshold):
     Calculate the distances between two chunks of data where:
     - Distant points get larger values
     - Points below threshold get 0
-    
+
     Args:
         chunk_i: data of the first chunk
         chunk_j: data of the second chunk
         threshold: minimum threshold for distance to be considered
-    
+
     Returns:
         distances: matrix of distances between chunks where larger values
                  indicate greater distances
@@ -82,6 +78,7 @@ def calc_chunk_distances(chunk_i, chunk_j, threshold):
             if dist > threshold:
                 distances[x, y] = dist
     return distances
+
 
 def calc_adjacency_matrix(pca_result, threshold=0.3, chunk_size=100):
     """
@@ -108,15 +105,16 @@ def calc_adjacency_matrix(pca_result, threshold=0.3, chunk_size=100):
             chunk_j = pca_result[j:end_j]
 
             distances = calc_chunk_distances(chunk_i, chunk_j, threshold)
-            
+
             # Fill the symmetric matrix
             for x in range(distances.shape[0]):
                 for y in range(distances.shape[1]):
                     if distances[x, y] > 0:
                         adjacency_matrix[i + x, j + y] = distances[x, y]
                         adjacency_matrix[j + y, i + x] = distances[x, y]
-    
+
     return adjacency_matrix
+
 
 def run_pca(arg, matrices, n, first_timer):
     """
@@ -134,7 +132,7 @@ def run_pca(arg, matrices, n, first_timer):
     cp_mat = matrices["COMMPROP"]["data"]
     dist_mat = matrices["MINDIST"]["data"]
     matrices = [gc_mat, int_mat, cp_mat]
-    
+
     data = reshape_matrices(matrices)
     del matrices
     '''
@@ -152,7 +150,7 @@ def run_pca(arg, matrices, n, first_timer):
     del data
     adj_mat_raw = calc_adjacency_matrix(pca_result)
     adj_mat = adj_mat_raw.toarray()
-    adj_mat = 1-adj_mat
+    adj_mat = 1 - adj_mat
     del adj_mat_raw
     adj_name = geom.get_matrix_name(arg.out_dir, arg.title, "ADJACENCY")
     adj_mat = geom.save_matrix(adj_mat, n, adj_name, norm=True, prec=4)

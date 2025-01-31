@@ -23,13 +23,13 @@ allowed_params = {
         'HA_cut',
         'DHA_cut',
         'heavy'},
-        
+
     'networks': {
         'pdb_file_path',
         'min_dist_matrix_file',
         'adjacency_file',
-        'results_dir'}        
-        
+        'results_dir'}
+
 }
 
 allowed_heavies = {'S', 'N', 'O'}
@@ -99,8 +99,10 @@ def parse_params(config_path):
     Returns:
         param_space: argparse.Namespace containing all parsed parameters.
     """
-    config_obj = read_config_file(config_path)  # Assumes this function reads and parses the config file
-    param_dict = check_config(config_obj)  # Assumes this function checks and validates the config
+    config_obj = read_config_file(
+        config_path)  # Assumes this function reads and parses the config file
+    param_dict = check_config(
+        config_obj)  # Assumes this function checks and validates the config
     param_space = Namespace()
 
     # General params
@@ -118,14 +120,16 @@ def parse_params(config_path):
     param_space.dha_cut = float(param_dict['hbonds']['DHA_cut'])
     param_space.heavies = set(param_dict['hbonds']['heavy'].split())
 
-    allowed_heavies = {'N', 'O', 'S'}  # Assuming these are the allowed heavy atoms for H-bonds
+    allowed_heavies = {'N', 'O',
+                       'S'}  # Assuming these are the allowed heavy atoms for H-bonds
     if not allowed_heavies.issuperset(param_space.heavies):
         raise ValueError(f'The computing of hbonds considers only '
                          f'{allowed_heavies} as heavy atoms (donor or acceptor).')
 
     # Network params
     param_space.pdb_file_path = param_dict['networks']['pdb_file_path']
-    param_space.min_dist_matrix_file = param_dict['networks']['min_dist_matrix_file']
+    param_space.min_dist_matrix_file = param_dict['networks'][
+        'min_dist_matrix_file']
     param_space.adjacency_file = param_dict['networks']['adjacency_file']
     param_space.results_dir = param_dict['networks']['results_dir']
 

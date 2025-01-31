@@ -1,11 +1,12 @@
 # Created by gonzalezroy at 6/28/24
 import time
 
-import config as cfg
 import mdtraj as md
 import numpy as np
-import topo_traj as tt
 from numba import njit, prange
+
+import config as cfg
+import topo_traj as tt
 
 
 @njit(parallel=True, fastmath=True)
@@ -147,7 +148,8 @@ counts = Counter(clusters).most_common()
 for x in counts:
     print(x)
     print(
-        "residue " + " ".join([str(x) for x in np.where(clusterer.labels_ == x[0])[0]])
+        "residue " + " ".join(
+            [str(x) for x in np.where(clusterer.labels_ == x[0])[0]])
     )
 
 clusterer.condensed_tree_.plot(select_clusters=True)
