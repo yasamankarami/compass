@@ -6,7 +6,6 @@ import networkx as nx
 import numpy as np
 from numba.typed import List
 
-import config as cfg
 import topo_traj as tt
 
 
@@ -92,12 +91,66 @@ def is_planar_cycle(cycle, coordinates, tolerance=10):
     return True
 
 
-config_path = "/home/gonzalezroy/RoyHub/Code_pronucompass/example/params.cfg"
-arg, dict_arg = cfg.parse_params(config_path)
+# %%=============================================================================
+# Debugging Area
+# =============================================================================
+import MDAnalysis as mda
 
-# Load trajectory
-trajs = arg.traj.split()
-mini_traj = next(md.iterload(trajs[0], top=arg.topo, chunk=1))
+topo = '/home/rglez/RoyHub/oxo-8/data/raw/A1/8oxoGA1_1_dry.prmtop'
+traj = '/home/rglez/RoyHub/oxo-8/data/raw/A1/8oxoGA1_1_dry.nc'
+
+topo = '/home/rglez/RoyHub/oxo-8/data/raw/water/A1/8oxoGA1_1_hmr.prmtop'
+traj = '/home/rglez/RoyHub/oxo-8/data/raw/water/A1/8oxoGA1_1_sk100.nc'
+
+sel1 = "nucleic or resname 8OG"
+sel2 = 'resname WAT'
+
+u = mda.Universe(topo, traj, to_guess=['types'], force_guess=True)
+
+u_resids, u_indices = np.unique(u.residues.resnames, return_index=True)
+for uinque_idx in u_indices:
+    s = u.select_atoms(f"resindex {uinque_idx}")
+    mapp = s.atoms.indices
+    try:
+        mol = s.atoms.convert_to("RDKIT")
+
+    except AttributeError:
+        print(f"Failed to convert {s.residues.resnames[0]}")
+        continue
+
+    except Exception as e:
+        s.guess_bonds()
+        print('rdkit')
+
+
+def isRingAromatic(mol, mapp):
+    ri = mol.GetRingInfo()
+    bond_rings = ri.BondRings()
+
+    aromatics = []
+    for bond_ring in bond_rings:
+
+        count = 0
+        atoms = set()
+        for id in bond_ring:
+            bond = mol.GetBondWithIdx(id)
+            at1 = bond.GetBeginAtomIdx()
+            at2 = bond.GetEndAtomIdx()
+            atoms.add(at1)
+            atoms.add(at2)
+
+            if not bond.GetIsAromatic():
+                count += 1
+
+        if count == 0:
+            aromatics.append(mapp[list(atoms)])
+
+    return aromatics
+
+
+aromatics = isRingAromatic(mol, mapp)
+
+mini_traj = next(md.iterload(traj, top=topo, chunk=1))
 full_topo = mini_traj.topology.to_dataframe()[0]
 
 # Indices of residues in the load trajectory and equivalence
@@ -109,11 +162,10 @@ atoms_to_resids = tt.pydict_to_numbadict(raw)
 # Get the planar cycles
 bonds = mini_traj.topology.bonds
 cycles_raw = get_cycles(bonds)
-coordinates = mini_traj.xyz[0] * 10  # Convert nm to Angstroms
+coordinates = mini_traj.xyz[0]
 cycles = [
     cycle for cycle in cycles_raw if
-    is_planar_cycle(cycle, coordinates, tolerance=15)
-]
+    is_planar_cycle(cycle, coordinates)]
 
 resids_to_rings_raw = defaultdict(List)
 for cycle in cycles:

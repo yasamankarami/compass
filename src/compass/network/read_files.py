@@ -41,7 +41,7 @@ class ReadFiles:
         rna = "(resname =~ '(3|5)?R?([AUGC]){1}(3|5)?$')"
         p_atoms = trajectory.topology.select(
             f'({dna} or {rna}) and name "C5\'"')
-        all_atoms = sorted(np.concatenate((ca_atoms, p_atoms)))
+        all_atoms = sorted(np.concatenate((ca_atoms, p_atoms)).astype(int))
 
         atom_mapping = {}  # Maps node index to atom information
         atoms = []

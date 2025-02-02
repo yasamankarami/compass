@@ -156,7 +156,7 @@ def get_resids_indices(trajectory):
     dna = "(resname =~ '(5|3)?D([ATGC]){1}(3|5)?$')"
     rna = "(resname =~ '(3|5)?R?([AUGC]){1}(3|5)?$')"
     p_atoms = trajectory.topology.select(f'({dna} or {rna}) and name "C5\'"')
-    all_atoms = sorted(np.concatenate((ca_atoms, p_atoms)))
+    all_atoms = sorted(np.concatenate((ca_atoms, p_atoms)).astype(int))
     res_names = [trajectory.topology.atom(i).residue.name for i in all_atoms]
     unique_res_names = np.unique(res_names)
     # print(unique_res_names)
@@ -250,7 +250,7 @@ def get_corr_indices(trajectory, map_file):
     rna = "(resname =~ '(3|5)?R?([AUGC]){1}(3|5)?$')"
     p_atoms = trajectory.topology.select(f'({dna} or {rna}) and name "C5\'"')
     # all_atoms = (np.concatenate((ca_atoms, p_atoms)))
-    all_atoms = sorted(np.concatenate((ca_atoms, p_atoms)))
+    all_atoms = sorted(np.concatenate((ca_atoms, p_atoms)).astype(int))
 
     # Write atom details to the specified map_file
     with open(map_file, 'w') as file:
@@ -283,7 +283,7 @@ def get_calpha_p_indices(trajectory, atoms_to_resids, map_file, numba=True):
     dna = "(resname =~ '(5|3)?D([ATGC]){1}(3|5)?$')"
     rna = "(resname =~ '(3|5)?R?([AUGC]){1}(3|5)?$')"
     p_atoms = trajectory.topology.select(f'({dna} or {rna}) and name "C5\'"')
-    all_atoms = (np.concatenate((ca_atoms, p_atoms)))
+    all_atoms = (np.concatenate((ca_atoms, p_atoms)).astype(int))
     n_resids = len(all_atoms)
     calphas_p_raw = get_corr_indices(trajectory, map_file)
     # print(np.shape(calphas_p_raw),n_resids)
