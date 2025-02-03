@@ -8,6 +8,8 @@ import os
 import sys
 import time
 from os.path import join
+from resource import getrusage as resource_usage, RUSAGE_SELF
+from time import time as timestamp
 
 import compass.descriptors.config as cfg
 import compass.descriptors.geometry as geom
@@ -24,12 +26,13 @@ def runner():
     # =========================================================================
     # 1. Prelude
     # =========================================================================
+    start_time, start_resources = timestamp(), resource_usage(RUSAGE_SELF)
+    first_timer = time.time()
     # Parse configuration file
     if len(sys.argv) != 2:
         raise ValueError(
             '\ncompass syntax is: compass path-to-config-file')
     config_path = sys.argv[1]
-    first_timer = time.time()
     arg, dict_arg = cfg.parse_params(config_path)
 
     # Prepare data structures
@@ -105,6 +108,11 @@ def runner():
                               dist_cutoffs[0], source_residue.strip(),
                               target_residue.strip())
 
-    pymol_time = round(time.time() - first_timer, 2)
-    print(f' ⏳  Until pymol scripts generation: {pymol_time} s')
+    end_resources, end_time = resource_usage(RUSAGE_SELF), timestamp()
+    real_time = end_time - start_time
+    user_time = end_resources.ru_utime - start_resources.ru_utime
+    system_time = end_resources.ru_stime - start_resources.ru_stime
+    print(f" ⏳  User Time: {user_time:.2f} seconds")
+    print(f" ⏳  System Time: {system_time:.2f} seconds")
+    print(f" ⏳  Wall Clock Time: {real_time:.2f} seconds")
     print(f"**** -------Normal Termination -------****")

@@ -207,7 +207,7 @@ class CliqueDetector:
                     all_cliques_file.write(
                         f"Clique {clique_idx}: {', '.join(new_members)}\n")
 
-            print(f"🧩  Cliques saved to {output_file}")
+            print(f" 🧩  Cliques saved to {output_file}")
 
         except IOError as e:
             print(f"Error writing cliques to file: {e}")
