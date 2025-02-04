@@ -32,7 +32,7 @@ If you are interested in contributing to the project, please review the guidelin
 
 
 ## License
-This project is licensed under the MIT License. For more details, check the [LICENSE](LICENSE.txt) file.
+This project is licensed under the BSD 3-Clause License. For more details, check the [LICENSE](LICENSE) file.
 
 
 ## Citation
