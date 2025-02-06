@@ -1,7 +1,7 @@
 load 1kx5_dry.pdb, structure
 show cartoon
 set cartoon_color, grey90
-set_color clique_1, [0.9906929935085764, 0.7543033491821797, 0.9524963201344092]
+set_color clique_1, [0.24572000208224554, 0.3173937522091923, 0.5465379646333481]
 color clique_1, chain  and resi 344
 show spheres, chain  and resi 344 and (name CA or name C5')
 color clique_1, chain  and resi 345
@@ -32,7 +32,8 @@ color clique_1, chain  and resi 1128
 show spheres, chain  and resi 1128 and (name CA or name C5')
 color clique_1, chain  and resi 1129
 show spheres, chain  and resi 1129 and (name CA or name C5')
-set_color clique_2, [0.7596276410973934, 0.18325209181859403, 0.9533095702737833]
+select clique_1, chain  and resi 344 + chain  and resi 345 + chain  and resi 346 + chain  and resi 347 + chain  and resi 348 + chain  and resi 349 + chain  and resi 350 + chain  and resi 468 + chain  and resi 469 + chain  and resi 470 + chain  and resi 471 + chain  and resi 1125 + chain  and resi 1127 + chain  and resi 1128 + chain  and resi 1129
+set_color clique_2, [0.30504890587202194, 0.7936945131298384, 0.7067208846373918]
 color clique_2, chain  and resi 407
 show spheres, chain  and resi 407 and (name CA or name C5')
 color clique_2, chain  and resi 888
@@ -63,7 +64,8 @@ color clique_2, chain  and resi 903
 show spheres, chain  and resi 903 and (name CA or name C5')
 color clique_2, chain  and resi 904
 show spheres, chain  and resi 904 and (name CA or name C5')
-set_color clique_3, [0.3758274865888057, 0.74316829115008, 0.34140216859721406]
+select clique_2, chain  and resi 407 + chain  and resi 888 + chain  and resi 889 + chain  and resi 890 + chain  and resi 891 + chain  and resi 892 + chain  and resi 893 + chain  and resi 895 + chain  and resi 896 + chain  and resi 897 + chain  and resi 899 + chain  and resi 900 + chain  and resi 901 + chain  and resi 903 + chain  and resi 904
+set_color clique_3, [0.9596573792069051, 0.7538961173055828, 0.18864092002630828]
 color clique_3, chain  and resi 401
 show spheres, chain  and resi 401 and (name CA or name C5')
 color clique_3, chain  and resi 402
@@ -94,7 +96,8 @@ color clique_3, chain  and resi 417
 show spheres, chain  and resi 417 and (name CA or name C5')
 color clique_3, chain  and resi 894
 show spheres, chain  and resi 894 and (name CA or name C5')
-set_color clique_4, [0.41478515044095277, 0.8252817964302568, 0.2647096580234596]
+select clique_3, chain  and resi 401 + chain  and resi 402 + chain  and resi 403 + chain  and resi 404 + chain  and resi 405 + chain  and resi 406 + chain  and resi 408 + chain  and resi 409 + chain  and resi 410 + chain  and resi 412 + chain  and resi 413 + chain  and resi 414 + chain  and resi 416 + chain  and resi 417 + chain  and resi 894
+set_color clique_4, [0.6933379399244418, 0.7400788770116828, 0.8916171563775676]
 color clique_4, chain  and resi 493
 show spheres, chain  and resi 493 and (name CA or name C5')
 color clique_4, chain  and resi 494
@@ -125,7 +128,8 @@ color clique_4, chain  and resi 521
 show spheres, chain  and resi 521 and (name CA or name C5')
 color clique_4, chain  and resi 522
 show spheres, chain  and resi 522 and (name CA or name C5')
-set_color clique_5, [0.6760854510601219, 0.41409683419134335, 0.8043556566455923]
+select clique_4, chain  and resi 493 + chain  and resi 494 + chain  and resi 495 + chain  and resi 496 + chain  and resi 497 + chain  and resi 498 + chain  and resi 499 + chain  and resi 500 + chain  and resi 501 + chain  and resi 514 + chain  and resi 515 + chain  and resi 517 + chain  and resi 518 + chain  and resi 521 + chain  and resi 522
+set_color clique_5, [0.404770442294623, 0.26658632102161106, 0.9695137130949811]
 color clique_5, chain  and resi 548
 show spheres, chain  and resi 548 and (name CA or name C5')
 color clique_5, chain  and resi 552
@@ -156,7 +160,8 @@ color clique_5, chain  and resi 774
 show spheres, chain  and resi 774 and (name CA or name C5')
 color clique_5, chain  and resi 777
 show spheres, chain  and resi 777 and (name CA or name C5')
-set_color clique_6, [0.24027950454162106, 0.19615613491798323, 0.4527422745907468]
+select clique_5, chain  and resi 548 + chain  and resi 552 + chain  and resi 554 + chain  and resi 558 + chain  and resi 576 + chain  and resi 577 + chain  and resi 578 + chain  and resi 579 + chain  and resi 580 + chain  and resi 581 + chain  and resi 583 + chain  and resi 584 + chain  and resi 773 + chain  and resi 774 + chain  and resi 777
+set_color clique_6, [0.956948017874817, 0.30603437665800426, 0.8582153487260787]
 color clique_6, chain  and resi 638
 show spheres, chain  and resi 638 and (name CA or name C5')
 color clique_6, chain  and resi 639
@@ -187,7 +192,8 @@ color clique_6, chain  and resi 957
 show spheres, chain  and resi 957 and (name CA or name C5')
 color clique_6, chain  and resi 958
 show spheres, chain  and resi 958 and (name CA or name C5')
-set_color clique_7, [0.8723486533650116, 0.49136081517573105, 0.32888527622018515]
+select clique_6, chain  and resi 638 + chain  and resi 639 + chain  and resi 640 + chain  and resi 641 + chain  and resi 642 + chain  and resi 832 + chain  and resi 833 + chain  and resi 834 + chain  and resi 835 + chain  and resi 836 + chain  and resi 837 + chain  and resi 955 + chain  and resi 956 + chain  and resi 957 + chain  and resi 958
+set_color clique_7, [0.17343086684982112, 0.10466000677193976, 0.508625288978481]
 color clique_7, chain  and resi 980
 show spheres, chain  and resi 980 and (name CA or name C5')
 color clique_7, chain  and resi 981
@@ -218,7 +224,8 @@ color clique_7, chain  and resi 1008
 show spheres, chain  and resi 1008 and (name CA or name C5')
 color clique_7, chain  and resi 1009
 show spheres, chain  and resi 1009 and (name CA or name C5')
-set_color clique_8, [0.18453298546424546, 0.7656473863023233, 0.4272293202668277]
+select clique_7, chain  and resi 980 + chain  and resi 981 + chain  and resi 982 + chain  and resi 983 + chain  and resi 984 + chain  and resi 985 + chain  and resi 986 + chain  and resi 987 + chain  and resi 988 + chain  and resi 1001 + chain  and resi 1002 + chain  and resi 1004 + chain  and resi 1005 + chain  and resi 1008 + chain  and resi 1009
+set_color clique_8, [0.7922095515354922, 0.15542980080131186, 0.19279877426493564]
 color clique_8, chain  and resi 991
 show spheres, chain  and resi 991 and (name CA or name C5')
 color clique_8, chain  and resi 1220
@@ -249,7 +256,8 @@ color clique_8, chain  and resi 1232
 show spheres, chain  and resi 1232 and (name CA or name C5')
 color clique_8, chain  and resi 1236
 show spheres, chain  and resi 1236 and (name CA or name C5')
-set_color clique_9, [0.4744629021309036, 0.8553562639459024, 0.02357557927003484]
+select clique_8, chain  and resi 991 + chain  and resi 1220 + chain  and resi 1221 + chain  and resi 1222 + chain  and resi 1223 + chain  and resi 1224 + chain  and resi 1225 + chain  and resi 1226 + chain  and resi 1227 + chain  and resi 1228 + chain  and resi 1229 + chain  and resi 1230 + chain  and resi 1231 + chain  and resi 1232 + chain  and resi 1236
+set_color clique_9, [0.41940009406132917, 0.6833791856189187, 0.03145539835904698]
 color clique_9, chain  and resi 1039
 show spheres, chain  and resi 1039 and (name CA or name C5')
 color clique_9, chain  and resi 1041
@@ -280,7 +288,8 @@ color clique_9, chain  and resi 1260
 show spheres, chain  and resi 1260 and (name CA or name C5')
 color clique_9, chain  and resi 1261
 show spheres, chain  and resi 1261 and (name CA or name C5')
-set_color clique_10, [0.8606096701220679, 0.3105969098391872, 0.42681450637317764]
+select clique_9, chain  and resi 1039 + chain  and resi 1041 + chain  and resi 1045 + chain  and resi 1064 + chain  and resi 1065 + chain  and resi 1066 + chain  and resi 1067 + chain  and resi 1068 + chain  and resi 1069 + chain  and resi 1070 + chain  and resi 1071 + chain  and resi 1072 + chain  and resi 1257 + chain  and resi 1260 + chain  and resi 1261
+set_color clique_10, [0.5223488966025799, 0.753377122083527, 0.2972399514833084]
 color clique_10, chain  and resi 1081
 show spheres, chain  and resi 1081 and (name CA or name C5')
 color clique_10, chain  and resi 1084
@@ -311,7 +320,8 @@ color clique_10, chain  and resi 1195
 show spheres, chain  and resi 1195 and (name CA or name C5')
 color clique_10, chain  and resi 1196
 show spheres, chain  and resi 1196 and (name CA or name C5')
-set_color clique_11, [0.4491919685147441, 0.8731975618311287, 0.7653238767091274]
+select clique_10, chain  and resi 1081 + chain  and resi 1084 + chain  and resi 1085 + chain  and resi 1086 + chain  and resi 1087 + chain  and resi 1088 + chain  and resi 1089 + chain  and resi 1094 + chain  and resi 1095 + chain  and resi 1096 + chain  and resi 1100 + chain  and resi 1188 + chain  and resi 1192 + chain  and resi 1195 + chain  and resi 1196
+set_color clique_11, [0.09948080606045595, 0.9528187770662562, 0.5584476124746552]
 color clique_11, chain  and resi 280
 show spheres, chain  and resi 280 and (name CA or name C5')
 color clique_11, chain  and resi 597
@@ -340,7 +350,8 @@ color clique_11, chain  and resi 610
 show spheres, chain  and resi 610 and (name CA or name C5')
 color clique_11, chain  and resi 613
 show spheres, chain  and resi 613 and (name CA or name C5')
-set_color clique_12, [0.237132104078423, 0.16071331114694842, 0.08878930755749681]
+select clique_11, chain  and resi 280 + chain  and resi 597 + chain  and resi 598 + chain  and resi 600 + chain  and resi 601 + chain  and resi 602 + chain  and resi 604 + chain  and resi 605 + chain  and resi 606 + chain  and resi 607 + chain  and resi 608 + chain  and resi 609 + chain  and resi 610 + chain  and resi 613
+set_color clique_12, [0.3340853108651506, 0.4952955787672658, 0.28895172614450737]
 color clique_12, chain  and resi 504
 show spheres, chain  and resi 504 and (name CA or name C5')
 color clique_12, chain  and resi 733
@@ -369,7 +380,8 @@ color clique_12, chain  and resi 745
 show spheres, chain  and resi 745 and (name CA or name C5')
 color clique_12, chain  and resi 749
 show spheres, chain  and resi 749 and (name CA or name C5')
-set_color clique_13, [0.08144626197029792, 0.25377320600021436, 0.9271894354475273]
+select clique_12, chain  and resi 504 + chain  and resi 733 + chain  and resi 734 + chain  and resi 735 + chain  and resi 736 + chain  and resi 737 + chain  and resi 738 + chain  and resi 739 + chain  and resi 740 + chain  and resi 741 + chain  and resi 742 + chain  and resi 744 + chain  and resi 745 + chain  and resi 749
+set_color clique_13, [0.8091639709300816, 0.35258289054370373, 0.4189667789721363]
 color clique_13, chain  and resi 587
 show spheres, chain  and resi 587 and (name CA or name C5')
 color clique_13, chain  and resi 588
@@ -398,7 +410,8 @@ color clique_13, chain  and resi 704
 show spheres, chain  and resi 704 and (name CA or name C5')
 color clique_13, chain  and resi 718
 show spheres, chain  and resi 718 and (name CA or name C5')
-set_color clique_14, [0.8482638867732973, 0.4016787138222019, 0.962723260574116]
+select clique_13, chain  and resi 587 + chain  and resi 588 + chain  and resi 589 + chain  and resi 590 + chain  and resi 591 + chain  and resi 592 + chain  and resi 593 + chain  and resi 594 + chain  and resi 595 + chain  and resi 697 + chain  and resi 700 + chain  and resi 701 + chain  and resi 704 + chain  and resi 718
+set_color clique_14, [0.7362040739027117, 0.2911905186420327, 0.7267089409850662]
 color clique_14, chain  and resi 60
 show spheres, chain  and resi 60 and (name CA or name C5')
 color clique_14, chain  and resi 61
@@ -425,7 +438,8 @@ color clique_14, chain  and resi 463
 show spheres, chain  and resi 463 and (name CA or name C5')
 color clique_14, chain  and resi 465
 show spheres, chain  and resi 465 and (name CA or name C5')
-set_color clique_15, [0.9921359585534915, 0.6114679660478458, 0.8881248159131049]
+select clique_14, chain  and resi 60 + chain  and resi 61 + chain  and resi 355 + chain  and resi 356 + chain  and resi 357 + chain  and resi 457 + chain  and resi 458 + chain  and resi 459 + chain  and resi 460 + chain  and resi 461 + chain  and resi 462 + chain  and resi 463 + chain  and resi 465
+set_color clique_15, [0.7445574696797409, 0.06739389647232097, 0.32299733775793404]
 color clique_15, chain  and resi 91
 show spheres, chain  and resi 91 and (name CA or name C5')
 color clique_15, chain  and resi 843
@@ -452,7 +466,8 @@ color clique_15, chain  and resi 944
 show spheres, chain  and resi 944 and (name CA or name C5')
 color clique_15, chain  and resi 945
 show spheres, chain  and resi 945 and (name CA or name C5')
-set_color clique_16, [0.1512854091220064, 0.38914587826139446, 0.46577726667161823]
+select clique_15, chain  and resi 91 + chain  and resi 843 + chain  and resi 844 + chain  and resi 845 + chain  and resi 846 + chain  and resi 847 + chain  and resi 848 + chain  and resi 849 + chain  and resi 850 + chain  and resi 851 + chain  and resi 874 + chain  and resi 944 + chain  and resi 945
+set_color clique_16, [0.8735140846972088, 0.014550370487811493, 0.16371654503240296]
 color clique_16, chain  and resi 354
 show spheres, chain  and resi 354 and (name CA or name C5')
 color clique_16, chain  and resi 384
@@ -479,7 +494,8 @@ color clique_16, chain  and resi 1121
 show spheres, chain  and resi 1121 and (name CA or name C5')
 color clique_16, chain  and resi 1122
 show spheres, chain  and resi 1122 and (name CA or name C5')
-set_color clique_17, [0.9560513131894304, 0.45376343548478915, 0.06503862243513647]
+select clique_16, chain  and resi 354 + chain  and resi 384 + chain  and resi 385 + chain  and resi 387 + chain  and resi 388 + chain  and resi 389 + chain  and resi 391 + chain  and resi 392 + chain  and resi 526 + chain  and resi 1119 + chain  and resi 1120 + chain  and resi 1121 + chain  and resi 1122
+set_color clique_17, [0.41963289093488765, 0.35141076505271585, 0.9393161876336231]
 color clique_17, chain  and resi 397
 show spheres, chain  and resi 397 and (name CA or name C5')
 color clique_17, chain  and resi 400
@@ -506,7 +522,8 @@ color clique_17, chain  and resi 427
 show spheres, chain  and resi 427 and (name CA or name C5')
 color clique_17, chain  and resi 911
 show spheres, chain  and resi 911 and (name CA or name C5')
-set_color clique_18, [0.885973912332439, 0.04506258246580319, 0.9364010710429128]
+select clique_17, chain  and resi 397 + chain  and resi 400 + chain  and resi 418 + chain  and resi 419 + chain  and resi 420 + chain  and resi 421 + chain  and resi 422 + chain  and resi 423 + chain  and resi 424 + chain  and resi 425 + chain  and resi 426 + chain  and resi 427 + chain  and resi 911
+set_color clique_18, [0.418599024614969, 0.7459001078779361, 0.33742141656930813]
 color clique_18, chain  and resi 527
 show spheres, chain  and resi 527 and (name CA or name C5')
 color clique_18, chain  and resi 528
@@ -533,7 +550,8 @@ color clique_18, chain  and resi 1208
 show spheres, chain  and resi 1208 and (name CA or name C5')
 color clique_18, chain  and resi 1210
 show spheres, chain  and resi 1210 and (name CA or name C5')
-set_color clique_19, [0.43446487305816084, 0.9795951175060964, 0.1653460262908376]
+select clique_18, chain  and resi 527 + chain  and resi 528 + chain  and resi 529 + chain  and resi 530 + chain  and resi 531 + chain  and resi 1202 + chain  and resi 1203 + chain  and resi 1204 + chain  and resi 1205 + chain  and resi 1206 + chain  and resi 1207 + chain  and resi 1208 + chain  and resi 1210
+set_color clique_19, [0.09670788696782995, 0.7333898352589736, 0.679501020517091]
 color clique_19, chain  and resi 585
 show spheres, chain  and resi 585 and (name CA or name C5')
 color clique_19, chain  and resi 729
@@ -560,7 +578,8 @@ color clique_19, chain  and resi 766
 show spheres, chain  and resi 766 and (name CA or name C5')
 color clique_19, chain  and resi 767
 show spheres, chain  and resi 767 and (name CA or name C5')
-set_color clique_20, [0.41947145883816706, 0.8122282405938118, 0.8392430622734157]
+select clique_19, chain  and resi 585 + chain  and resi 729 + chain  and resi 750 + chain  and resi 751 + chain  and resi 752 + chain  and resi 753 + chain  and resi 754 + chain  and resi 755 + chain  and resi 757 + chain  and resi 758 + chain  and resi 763 + chain  and resi 766 + chain  and resi 767
+set_color clique_20, [0.6508956899789807, 0.014576069404116154, 0.12745613474105133]
 color clique_20, chain  and resi 632
 show spheres, chain  and resi 632 and (name CA or name C5')
 color clique_20, chain  and resi 872
@@ -587,7 +606,8 @@ color clique_20, chain  and resi 1011
 show spheres, chain  and resi 1011 and (name CA or name C5')
 color clique_20, chain  and resi 1013
 show spheres, chain  and resi 1013 and (name CA or name C5')
-set_color clique_21, [0.3219391518973552, 0.42905820300913367, 0.48997123649430674]
+select clique_20, chain  and resi 632 + chain  and resi 872 + chain  and resi 873 + chain  and resi 875 + chain  and resi 876 + chain  and resi 877 + chain  and resi 878 + chain  and resi 879 + chain  and resi 880 + chain  and resi 977 + chain  and resi 1006 + chain  and resi 1011 + chain  and resi 1013
+set_color clique_21, [0.44026348321052555, 0.5408405273823386, 0.8912855784246906]
 color clique_21, chain  and resi 885
 show spheres, chain  and resi 885 and (name CA or name C5')
 color clique_21, chain  and resi 946
@@ -614,7 +634,8 @@ color clique_21, chain  and resi 967
 show spheres, chain  and resi 967 and (name CA or name C5')
 color clique_21, chain  and resi 970
 show spheres, chain  and resi 970 and (name CA or name C5')
-set_color clique_22, [0.1512306726140582, 0.30836141249418547, 0.30198015255805477]
+select clique_21, chain  and resi 885 + chain  and resi 946 + chain  and resi 947 + chain  and resi 949 + chain  and resi 950 + chain  and resi 951 + chain  and resi 952 + chain  and resi 953 + chain  and resi 954 + chain  and resi 962 + chain  and resi 966 + chain  and resi 967 + chain  and resi 970
+set_color clique_22, [0.4103143250640108, 0.5817591787436649, 0.9425098340164011]
 color clique_22, chain  and resi 1079
 show spheres, chain  and resi 1079 and (name CA or name C5')
 color clique_22, chain  and resi 1080
@@ -641,7 +662,8 @@ color clique_22, chain  and resi 1112
 show spheres, chain  and resi 1112 and (name CA or name C5')
 color clique_22, chain  and resi 1115
 show spheres, chain  and resi 1115 and (name CA or name C5')
-set_color clique_23, [0.31053356441938806, 0.48729009009300295, 0.28448619824949306]
+select clique_22, chain  and resi 1079 + chain  and resi 1080 + chain  and resi 1083 + chain  and resi 1101 + chain  and resi 1103 + chain  and resi 1104 + chain  and resi 1105 + chain  and resi 1106 + chain  and resi 1107 + chain  and resi 1108 + chain  and resi 1111 + chain  and resi 1112 + chain  and resi 1115
+set_color clique_23, [0.31400820532806695, 0.3519896220700377, 0.7514005209386937]
 color clique_23, chain  and resi 1216
 show spheres, chain  and resi 1216 and (name CA or name C5')
 color clique_23, chain  and resi 1237
@@ -668,7 +690,8 @@ color clique_23, chain  and resi 1253
 show spheres, chain  and resi 1253 and (name CA or name C5')
 color clique_23, chain  and resi 1254
 show spheres, chain  and resi 1254 and (name CA or name C5')
-set_color clique_24, [0.8945718860419466, 0.5973257080696894, 0.7618249539233127]
+select clique_23, chain  and resi 1216 + chain  and resi 1237 + chain  and resi 1238 + chain  and resi 1239 + chain  and resi 1240 + chain  and resi 1241 + chain  and resi 1242 + chain  and resi 1243 + chain  and resi 1244 + chain  and resi 1245 + chain  and resi 1250 + chain  and resi 1253 + chain  and resi 1254
+set_color clique_24, [0.8788267698163145, 0.6884373891744532, 0.9952773813690834]
 color clique_24, chain  and resi 1
 show spheres, chain  and resi 1 and (name CA or name C5')
 color clique_24, chain  and resi 2
@@ -693,7 +716,8 @@ color clique_24, chain  and resi 804
 show spheres, chain  and resi 804 and (name CA or name C5')
 color clique_24, chain  and resi 807
 show spheres, chain  and resi 807 and (name CA or name C5')
-set_color clique_25, [0.7942543240065638, 0.6351297409294536, 0.2855737640638878]
+select clique_24, chain  and resi 1 + chain  and resi 2 + chain  and resi 294 + chain  and resi 796 + chain  and resi 797 + chain  and resi 799 + chain  and resi 800 + chain  and resi 801 + chain  and resi 802 + chain  and resi 803 + chain  and resi 804 + chain  and resi 807
+set_color clique_25, [0.9346850445245989, 0.035789590032732965, 0.30014368969071736]
 color clique_25, chain  and resi 31
 show spheres, chain  and resi 31 and (name CA or name C5')
 color clique_25, chain  and resi 32
@@ -718,7 +742,8 @@ color clique_25, chain  and resi 545
 show spheres, chain  and resi 545 and (name CA or name C5')
 color clique_25, chain  and resi 546
 show spheres, chain  and resi 546 and (name CA or name C5')
-set_color clique_26, [0.690805741198025, 0.44272529029551133, 0.07630473846787611]
+select clique_25, chain  and resi 31 + chain  and resi 32 + chain  and resi 265 + chain  and resi 266 + chain  and resi 267 + chain  and resi 540 + chain  and resi 541 + chain  and resi 542 + chain  and resi 543 + chain  and resi 544 + chain  and resi 545 + chain  and resi 546
+set_color clique_26, [0.07946674855255376, 0.43492295013391813, 0.2873666876883394]
 color clique_26, chain  and resi 45
 show spheres, chain  and resi 45 and (name CA or name C5')
 color clique_26, chain  and resi 46
@@ -743,7 +768,8 @@ color clique_26, chain  and resi 1172
 show spheres, chain  and resi 1172 and (name CA or name C5')
 color clique_26, chain  and resi 1173
 show spheres, chain  and resi 1173 and (name CA or name C5')
-set_color clique_27, [0.8426612497085701, 0.26071918908325875, 0.24860237521071327]
+select clique_26, chain  and resi 45 + chain  and resi 46 + chain  and resi 47 + chain  and resi 1164 + chain  and resi 1165 + chain  and resi 1166 + chain  and resi 1168 + chain  and resi 1169 + chain  and resi 1170 + chain  and resi 1171 + chain  and resi 1172 + chain  and resi 1173
+set_color clique_27, [0.4673191940603453, 0.7016770403932039, 0.9534228969953633]
 color clique_27, chain  and resi 49
 show spheres, chain  and resi 49 and (name CA or name C5')
 color clique_27, chain  and resi 50
@@ -768,7 +794,8 @@ color clique_27, chain  and resi 509
 show spheres, chain  and resi 509 and (name CA or name C5')
 color clique_27, chain  and resi 510
 show spheres, chain  and resi 510 and (name CA or name C5')
-set_color clique_28, [0.53944053819855, 0.33136071991629945, 0.19320914957220636]
+select clique_27, chain  and resi 49 + chain  and resi 50 + chain  and resi 51 + chain  and resi 366 + chain  and resi 377 + chain  and resi 378 + chain  and resi 379 + chain  and resi 380 + chain  and resi 381 + chain  and resi 382 + chain  and resi 509 + chain  and resi 510
+set_color clique_28, [0.4299576592310598, 0.5570386295826374, 0.9232741780467782]
 color clique_28, chain  and resi 63
 show spheres, chain  and resi 63 and (name CA or name C5')
 color clique_28, chain  and resi 64
@@ -793,7 +820,8 @@ color clique_28, chain  and resi 439
 show spheres, chain  and resi 439 and (name CA or name C5')
 color clique_28, chain  and resi 441
 show spheres, chain  and resi 441 and (name CA or name C5')
-set_color clique_29, [0.9310959150346754, 0.03918315585390264, 0.49846400159342275]
+select clique_28, chain  and resi 63 + chain  and resi 64 + chain  and resi 431 + chain  and resi 432 + chain  and resi 433 + chain  and resi 434 + chain  and resi 435 + chain  and resi 436 + chain  and resi 437 + chain  and resi 438 + chain  and resi 439 + chain  and resi 441
+set_color clique_29, [0.26168165670531707, 0.8355739190244275, 0.3034950762060137]
 color clique_29, chain  and resi 82
 show spheres, chain  and resi 82 and (name CA or name C5')
 color clique_29, chain  and resi 83
@@ -818,7 +846,8 @@ color clique_29, chain  and resi 828
 show spheres, chain  and resi 828 and (name CA or name C5')
 color clique_29, chain  and resi 830
 show spheres, chain  and resi 830 and (name CA or name C5')
-set_color clique_30, [0.5052645762246923, 0.29591115393128953, 0.8517995263398503]
+select clique_29, chain  and resi 82 + chain  and resi 83 + chain  and resi 84 + chain  and resi 292 + chain  and resi 822 + chain  and resi 823 + chain  and resi 824 + chain  and resi 825 + chain  and resi 826 + chain  and resi 827 + chain  and resi 828 + chain  and resi 830
+set_color clique_30, [0.04746260429413318, 0.6213968699054028, 0.4313677663245393]
 color clique_30, chain  and resi 101
 show spheres, chain  and resi 101 and (name CA or name C5')
 color clique_30, chain  and resi 102
@@ -843,7 +872,8 @@ color clique_30, chain  and resi 997
 show spheres, chain  and resi 997 and (name CA or name C5')
 color clique_30, chain  and resi 998
 show spheres, chain  and resi 998 and (name CA or name C5')
-set_color clique_31, [0.04794731007347508, 0.10130508955836381, 0.031987414207199194]
+select clique_30, chain  and resi 101 + chain  and resi 102 + chain  and resi 863 + chain  and resi 864 + chain  and resi 865 + chain  and resi 866 + chain  and resi 989 + chain  and resi 994 + chain  and resi 995 + chain  and resi 996 + chain  and resi 997 + chain  and resi 998
+set_color clique_31, [0.5225737697562467, 0.2895405651351226, 0.620249966736389]
 color clique_31, chain  and resi 117
 show spheres, chain  and resi 117 and (name CA or name C5')
 color clique_31, chain  and resi 118
@@ -868,7 +898,8 @@ color clique_31, chain  and resi 1030
 show spheres, chain  and resi 1030 and (name CA or name C5')
 color clique_31, chain  and resi 1031
 show spheres, chain  and resi 1031 and (name CA or name C5')
-set_color clique_32, [0.24887954059344264, 0.3623394646511555, 0.6820529930912403]
+select clique_31, chain  and resi 117 + chain  and resi 118 + chain  and resi 178 + chain  and resi 179 + chain  and resi 180 + chain  and resi 1021 + chain  and resi 1026 + chain  and resi 1027 + chain  and resi 1028 + chain  and resi 1029 + chain  and resi 1030 + chain  and resi 1031
+set_color clique_32, [0.5037455895545183, 0.0756515446697521, 0.01241828715370441]
 color clique_32, chain  and resi 144
 show spheres, chain  and resi 144 and (name CA or name C5')
 color clique_32, chain  and resi 145
@@ -893,7 +924,8 @@ color clique_32, chain  and resi 342
 show spheres, chain  and resi 342 and (name CA or name C5')
 color clique_32, chain  and resi 343
 show spheres, chain  and resi 343 and (name CA or name C5')
-set_color clique_33, [0.7963232696002545, 0.5913844875081371, 0.5203794457580035]
+select clique_32, chain  and resi 144 + chain  and resi 145 + chain  and resi 230 + chain  and resi 335 + chain  and resi 336 + chain  and resi 337 + chain  and resi 338 + chain  and resi 339 + chain  and resi 340 + chain  and resi 341 + chain  and resi 342 + chain  and resi 343
+set_color clique_33, [0.8759477539941048, 0.751789624872405, 0.4644540135684181]
 color clique_33, chain  and resi 364
 show spheres, chain  and resi 364 and (name CA or name C5')
 color clique_33, chain  and resi 394
@@ -918,7 +950,8 @@ color clique_33, chain  and resi 490
 show spheres, chain  and resi 490 and (name CA or name C5')
 color clique_33, chain  and resi 491
 show spheres, chain  and resi 491 and (name CA or name C5')
-set_color clique_34, [0.2505774156115125, 0.6213196580083292, 0.3676863309048106]
+select clique_33, chain  and resi 364 + chain  and resi 394 + chain  and resi 455 + chain  and resi 483 + chain  and resi 484 + chain  and resi 485 + chain  and resi 486 + chain  and resi 487 + chain  and resi 488 + chain  and resi 489 + chain  and resi 490 + chain  and resi 491
+set_color clique_34, [0.8024553219517091, 0.5670735411391025, 0.8410299211648825]
 color clique_34, chain  and resi 428
 show spheres, chain  and resi 428 and (name CA or name C5')
 color clique_34, chain  and resi 618
@@ -943,7 +976,8 @@ color clique_34, chain  and resi 628
 show spheres, chain  and resi 628 and (name CA or name C5')
 color clique_34, chain  and resi 629
 show spheres, chain  and resi 629 and (name CA or name C5')
-set_color clique_35, [0.8104642385102716, 0.12173187806200414, 0.32326972196838766]
+select clique_34, chain  and resi 428 + chain  and resi 618 + chain  and resi 619 + chain  and resi 621 + chain  and resi 622 + chain  and resi 623 + chain  and resi 624 + chain  and resi 625 + chain  and resi 626 + chain  and resi 627 + chain  and resi 628 + chain  and resi 629
+set_color clique_35, [0.6564677163549075, 0.21115268266565224, 0.7688620198347965]
 color clique_35, chain  and resi 560
 show spheres, chain  and resi 560 and (name CA or name C5')
 color clique_35, chain  and resi 561
@@ -968,7 +1002,8 @@ color clique_35, chain  and resi 574
 show spheres, chain  and resi 574 and (name CA or name C5')
 color clique_35, chain  and resi 726
 show spheres, chain  and resi 726 and (name CA or name C5')
-set_color clique_36, [0.9007755614625567, 0.009915907635722587, 0.7883887838386033]
+select clique_35, chain  and resi 560 + chain  and resi 561 + chain  and resi 562 + chain  and resi 563 + chain  and resi 564 + chain  and resi 565 + chain  and resi 566 + chain  and resi 567 + chain  and resi 568 + chain  and resi 570 + chain  and resi 574 + chain  and resi 726
+set_color clique_36, [0.9678793524452202, 0.8001934980820044, 0.6812020555558487]
 color clique_36, chain  and resi 1047
 show spheres, chain  and resi 1047 and (name CA or name C5')
 color clique_36, chain  and resi 1048
@@ -993,7 +1028,8 @@ color clique_36, chain  and resi 1061
 show spheres, chain  and resi 1061 and (name CA or name C5')
 color clique_36, chain  and resi 1213
 show spheres, chain  and resi 1213 and (name CA or name C5')
-set_color clique_37, [0.8525502591363179, 0.2819471024872797, 0.8399403528313433]
+select clique_36, chain  and resi 1047 + chain  and resi 1048 + chain  and resi 1049 + chain  and resi 1050 + chain  and resi 1051 + chain  and resi 1052 + chain  and resi 1053 + chain  and resi 1054 + chain  and resi 1055 + chain  and resi 1057 + chain  and resi 1061 + chain  and resi 1213
+set_color clique_37, [0.6728409200349925, 0.21013433726240982, 0.30623229463643487]
 color clique_37, chain  and resi 27
 show spheres, chain  and resi 27 and (name CA or name C5')
 color clique_37, chain  and resi 104
@@ -1016,7 +1052,8 @@ color clique_37, chain  and resi 685
 show spheres, chain  and resi 685 and (name CA or name C5')
 color clique_37, chain  and resi 686
 show spheres, chain  and resi 686 and (name CA or name C5')
-set_color clique_38, [0.027574334982663706, 0.18896850549790845, 0.358458178605499]
+select clique_37, chain  and resi 27 + chain  and resi 104 + chain  and resi 105 + chain  and resi 106 + chain  and resi 668 + chain  and resi 669 + chain  and resi 670 + chain  and resi 671 + chain  and resi 672 + chain  and resi 685 + chain  and resi 686
+set_color clique_38, [0.7972587884994019, 0.6807504054795355, 0.15055077134747408]
 color clique_38, chain  and resi 98
 show spheres, chain  and resi 98 and (name CA or name C5')
 color clique_38, chain  and resi 99
@@ -1039,7 +1076,8 @@ color clique_38, chain  and resi 930
 show spheres, chain  and resi 930 and (name CA or name C5')
 color clique_38, chain  and resi 933
 show spheres, chain  and resi 933 and (name CA or name C5')
-set_color clique_39, [0.9498837712473932, 0.005156124579153265, 0.06459120132755303]
+select clique_38, chain  and resi 98 + chain  and resi 99 + chain  and resi 100 + chain  and resi 199 + chain  and resi 925 + chain  and resi 926 + chain  and resi 927 + chain  and resi 928 + chain  and resi 929 + chain  and resi 930 + chain  and resi 933
+set_color clique_39, [0.7990650255834829, 0.9692396580070062, 0.5361777442412067]
 color clique_39, chain  and resi 233
 show spheres, chain  and resi 233 and (name CA or name C5')
 color clique_39, chain  and resi 307
@@ -1062,7 +1100,8 @@ color clique_39, chain  and resi 323
 show spheres, chain  and resi 323 and (name CA or name C5')
 color clique_39, chain  and resi 324
 show spheres, chain  and resi 324 and (name CA or name C5')
-set_color clique_40, [0.7738211108863347, 0.17141557474236513, 0.3878660795628456]
+select clique_39, chain  and resi 233 + chain  and resi 307 + chain  and resi 308 + chain  and resi 309 + chain  and resi 310 + chain  and resi 311 + chain  and resi 320 + chain  and resi 321 + chain  and resi 322 + chain  and resi 323 + chain  and resi 324
+set_color clique_40, [0.5694176322149611, 0.5879807339040314, 0.6949061245067419]
 color clique_40, chain  and resi 611
 show spheres, chain  and resi 611 and (name CA or name C5')
 color clique_40, chain  and resi 614
@@ -1085,7 +1124,8 @@ color clique_40, chain  and resi 1014
 show spheres, chain  and resi 1014 and (name CA or name C5')
 color clique_40, chain  and resi 1015
 show spheres, chain  and resi 1015 and (name CA or name C5')
-set_color clique_41, [0.5556600082141858, 0.569694914419034, 0.1261207582146595]
+select clique_40, chain  and resi 611 + chain  and resi 614 + chain  and resi 634 + chain  and resi 635 + chain  and resi 712 + chain  and resi 713 + chain  and resi 714 + chain  and resi 716 + chain  and resi 717 + chain  and resi 1014 + chain  and resi 1015
+set_color clique_41, [0.6140087326757961, 0.2533578356527051, 0.27620087228236245]
 color clique_41, chain  and resi 884
 show spheres, chain  and resi 884 and (name CA or name C5')
 color clique_41, chain  and resi 905
@@ -1108,7 +1148,8 @@ color clique_41, chain  and resi 915
 show spheres, chain  and resi 915 and (name CA or name C5')
 color clique_41, chain  and resi 973
 show spheres, chain  and resi 973 and (name CA or name C5')
-set_color clique_42, [0.14966801817294728, 0.46832461640595746, 0.9585045263772168]
+select clique_41, chain  and resi 884 + chain  and resi 905 + chain  and resi 906 + chain  and resi 907 + chain  and resi 908 + chain  and resi 909 + chain  and resi 910 + chain  and resi 912 + chain  and resi 914 + chain  and resi 915 + chain  and resi 973
+set_color clique_42, [0.1111103815203357, 0.5536519171543729, 0.10217664715223462]
 color clique_42, chain  and resi 1042
 show spheres, chain  and resi 1042 and (name CA or name C5')
 color clique_42, chain  and resi 1043
@@ -1131,7 +1172,8 @@ color clique_42, chain  and resi 1186
 show spheres, chain  and resi 1186 and (name CA or name C5')
 color clique_42, chain  and resi 1187
 show spheres, chain  and resi 1187 and (name CA or name C5')
-set_color clique_43, [0.957426557014177, 0.3278027404329197, 0.38098191443587026]
+select clique_42, chain  and resi 1042 + chain  and resi 1043 + chain  and resi 1044 + chain  and resi 1074 + chain  and resi 1077 + chain  and resi 1180 + chain  and resi 1182 + chain  and resi 1183 + chain  and resi 1184 + chain  and resi 1186 + chain  and resi 1187
+set_color clique_43, [0.4886344499161057, 0.04419699662624499, 0.6757289567015154]
 color clique_43, chain  and resi 142
 show spheres, chain  and resi 142 and (name CA or name C5')
 color clique_43, chain  and resi 143
@@ -1152,7 +1194,8 @@ color clique_43, chain  and resi 1145
 show spheres, chain  and resi 1145 and (name CA or name C5')
 color clique_43, chain  and resi 1146
 show spheres, chain  and resi 1146 and (name CA or name C5')
-set_color clique_44, [0.8107824953225655, 0.10920695042514383, 0.8827074640519839]
+select clique_43, chain  and resi 142 + chain  and resi 143 + chain  and resi 155 + chain  and resi 156 + chain  and resi 1141 + chain  and resi 1142 + chain  and resi 1143 + chain  and resi 1144 + chain  and resi 1145 + chain  and resi 1146
+set_color clique_44, [0.19062288762448854, 0.10827108389221662, 0.244423548046116]
 color clique_44, chain  and resi 146
 show spheres, chain  and resi 146 and (name CA or name C5')
 color clique_44, chain  and resi 147
@@ -1173,7 +1216,8 @@ color clique_44, chain  and resi 301
 show spheres, chain  and resi 301 and (name CA or name C5')
 color clique_44, chain  and resi 302
 show spheres, chain  and resi 302 and (name CA or name C5')
-set_color clique_45, [0.424863357791214, 0.4867875515066976, 0.6121863379799485]
+select clique_44, chain  and resi 146 + chain  and resi 147 + chain  and resi 148 + chain  and resi 149 + chain  and resi 150 + chain  and resi 298 + chain  and resi 299 + chain  and resi 300 + chain  and resi 301 + chain  and resi 302
+set_color clique_45, [0.13684808960499328, 0.9992394573560719, 0.0885722116947113]
 color clique_45, chain  and resi 237
 show spheres, chain  and resi 237 and (name CA or name C5')
 color clique_45, chain  and resi 444
@@ -1194,7 +1238,8 @@ color clique_45, chain  and resi 452
 show spheres, chain  and resi 452 and (name CA or name C5')
 color clique_45, chain  and resi 453
 show spheres, chain  and resi 453 and (name CA or name C5')
-set_color clique_46, [0.38776224682867033, 0.961877113501499, 0.38320224934636005]
+select clique_45, chain  and resi 237 + chain  and resi 444 + chain  and resi 445 + chain  and resi 446 + chain  and resi 447 + chain  and resi 448 + chain  and resi 450 + chain  and resi 451 + chain  and resi 452 + chain  and resi 453
+set_color clique_46, [0.9236996541913726, 0.3758116278216752, 0.8513742576184236]
 color clique_46, chain  and resi 3
 show spheres, chain  and resi 3 and (name CA or name C5')
 color clique_46, chain  and resi 788
@@ -1213,7 +1258,8 @@ color clique_46, chain  and resi 810
 show spheres, chain  and resi 810 and (name CA or name C5')
 color clique_46, chain  and resi 812
 show spheres, chain  and resi 812 and (name CA or name C5')
-set_color clique_47, [0.1060598251013325, 0.18836050902796764, 0.5507406979047412]
+select clique_46, chain  and resi 3 + chain  and resi 788 + chain  and resi 789 + chain  and resi 790 + chain  and resi 792 + chain  and resi 793 + chain  and resi 808 + chain  and resi 810 + chain  and resi 812
+set_color clique_47, [0.21237901572762374, 0.12934263812337388, 0.05794503299976761]
 color clique_47, chain  and resi 4
 show spheres, chain  and resi 4 and (name CA or name C5')
 color clique_47, chain  and resi 5
@@ -1232,7 +1278,8 @@ color clique_47, chain  and resi 818
 show spheres, chain  and resi 818 and (name CA or name C5')
 color clique_47, chain  and resi 819
 show spheres, chain  and resi 819 and (name CA or name C5')
-set_color clique_48, [0.13666877099524144, 0.002424686793979114, 0.5493093356631624]
+select clique_47, chain  and resi 4 + chain  and resi 5 + chain  and resi 813 + chain  and resi 814 + chain  and resi 815 + chain  and resi 816 + chain  and resi 817 + chain  and resi 818 + chain  and resi 819
+set_color clique_48, [0.47877220432350087, 0.8567455730590451, 0.8461802709646621]
 color clique_48, chain  and resi 19
 show spheres, chain  and resi 19 and (name CA or name C5')
 color clique_48, chain  and resi 20
@@ -1251,7 +1298,8 @@ color clique_48, chain  and resi 709
 show spheres, chain  and resi 709 and (name CA or name C5')
 color clique_48, chain  and resi 710
 show spheres, chain  and resi 710 and (name CA or name C5')
-set_color clique_49, [0.18298653373981788, 0.06797260538291305, 0.8293370165302215]
+select clique_48, chain  and resi 19 + chain  and resi 20 + chain  and resi 21 + chain  and resi 698 + chain  and resi 702 + chain  and resi 707 + chain  and resi 708 + chain  and resi 709 + chain  and resi 710
+set_color clique_49, [0.13749214961664113, 0.5975017397554272, 0.8972508393359038]
 color clique_49, chain  and resi 28
 show spheres, chain  and resi 28 and (name CA or name C5')
 color clique_49, chain  and resi 29
@@ -1270,7 +1318,8 @@ color clique_49, chain  and resi 690
 show spheres, chain  and resi 690 and (name CA or name C5')
 color clique_49, chain  and resi 691
 show spheres, chain  and resi 691 and (name CA or name C5')
-set_color clique_50, [0.3160817271562987, 0.6559800106815278, 0.18430362844249282]
+select clique_49, chain  and resi 28 + chain  and resi 29 + chain  and resi 269 + chain  and resi 270 + chain  and resi 271 + chain  and resi 688 + chain  and resi 689 + chain  and resi 690 + chain  and resi 691
+set_color clique_50, [0.29417208432153774, 0.7017261587247126, 0.7087974426434488]
 color clique_50, chain  and resi 33
 show spheres, chain  and resi 33 and (name CA or name C5')
 color clique_50, chain  and resi 532
@@ -1289,7 +1338,8 @@ color clique_50, chain  and resi 780
 show spheres, chain  and resi 780 and (name CA or name C5')
 color clique_50, chain  and resi 781
 show spheres, chain  and resi 781 and (name CA or name C5')
-set_color clique_51, [0.16157523800381313, 0.9586584692708465, 0.018346670875345583]
+select clique_50, chain  and resi 33 + chain  and resi 532 + chain  and resi 533 + chain  and resi 534 + chain  and resi 535 + chain  and resi 536 + chain  and resi 537 + chain  and resi 780 + chain  and resi 781
+set_color clique_51, [0.9284111581060558, 0.8930291669403366, 0.6479306426078937]
 color clique_51, chain  and resi 35
 show spheres, chain  and resi 35 and (name CA or name C5')
 color clique_51, chain  and resi 36
@@ -1308,7 +1358,8 @@ color clique_51, chain  and resi 260
 show spheres, chain  and resi 260 and (name CA or name C5')
 color clique_51, chain  and resi 573
 show spheres, chain  and resi 573 and (name CA or name C5')
-set_color clique_52, [0.18105564309160416, 0.2377145640440108, 0.17412441383384447]
+select clique_51, chain  and resi 35 + chain  and resi 36 + chain  and resi 37 + chain  and resi 38 + chain  and resi 257 + chain  and resi 258 + chain  and resi 259 + chain  and resi 260 + chain  and resi 573
+set_color clique_52, [0.12654382036315903, 0.5814271013200382, 0.668150188946326]
 color clique_52, chain  and resi 68
 show spheres, chain  and resi 68 and (name CA or name C5')
 color clique_52, chain  and resi 69
@@ -1327,7 +1378,8 @@ color clique_52, chain  and resi 228
 show spheres, chain  and resi 228 and (name CA or name C5')
 color clique_52, chain  and resi 474
 show spheres, chain  and resi 474 and (name CA or name C5')
-set_color clique_53, [0.9464998442301521, 0.727978348396654, 0.7706617985224704]
+select clique_52, chain  and resi 68 + chain  and resi 69 + chain  and resi 70 + chain  and resi 71 + chain  and resi 225 + chain  and resi 226 + chain  and resi 227 + chain  and resi 228 + chain  and resi 474
+set_color clique_53, [0.5889808057755122, 0.19530087257002138, 0.49691699839636094]
 color clique_53, chain  and resi 78
 show spheres, chain  and resi 78 and (name CA or name C5')
 color clique_53, chain  and resi 79
@@ -1346,7 +1398,8 @@ color clique_53, chain  and resi 219
 show spheres, chain  and resi 219 and (name CA or name C5')
 color clique_53, chain  and resi 961
 show spheres, chain  and resi 961 and (name CA or name C5')
-set_color clique_54, [0.904203246968894, 0.09928738436528683, 0.6424489863355681]
+select clique_53, chain  and resi 78 + chain  and resi 79 + chain  and resi 80 + chain  and resi 81 + chain  and resi 216 + chain  and resi 217 + chain  and resi 218 + chain  and resi 219 + chain  and resi 961
+set_color clique_54, [0.6159163688221724, 0.9685959688991455, 0.956930717864511]
 color clique_54, chain  and resi 121
 show spheres, chain  and resi 121 and (name CA or name C5')
 color clique_54, chain  and resi 122
@@ -1365,7 +1418,8 @@ color clique_54, chain  and resi 1176
 show spheres, chain  and resi 1176 and (name CA or name C5')
 color clique_54, chain  and resi 1178
 show spheres, chain  and resi 1178 and (name CA or name C5')
-set_color clique_55, [0.7452110202394059, 0.2319002713036067, 0.3392692375824061]
+select clique_54, chain  and resi 121 + chain  and resi 122 + chain  and resi 123 + chain  and resi 174 + chain  and resi 175 + chain  and resi 176 + chain  and resi 177 + chain  and resi 1176 + chain  and resi 1178
+set_color clique_55, [0.45387731695301103, 0.3352444341023111, 0.024602116161432264]
 color clique_55, chain  and resi 185
 show spheres, chain  and resi 185 and (name CA or name C5')
 color clique_55, chain  and resi 186
@@ -1384,7 +1438,8 @@ color clique_55, chain  and resi 665
 show spheres, chain  and resi 665 and (name CA or name C5')
 color clique_55, chain  and resi 666
 show spheres, chain  and resi 666 and (name CA or name C5')
-set_color clique_56, [0.5932330516565166, 0.14140492904763124, 0.010951845260754767]
+select clique_55, chain  and resi 185 + chain  and resi 186 + chain  and resi 187 + chain  and resi 661 + chain  and resi 662 + chain  and resi 663 + chain  and resi 664 + chain  and resi 665 + chain  and resi 666
+set_color clique_56, [0.5401223444381623, 0.4937071667399884, 0.12072151382660201]
 color clique_56, chain  and resi 643
 show spheres, chain  and resi 643 and (name CA or name C5')
 color clique_56, chain  and resi 644
@@ -1403,7 +1458,8 @@ color clique_56, chain  and resi 829
 show spheres, chain  and resi 829 and (name CA or name C5')
 color clique_56, chain  and resi 960
 show spheres, chain  and resi 960 and (name CA or name C5')
-set_color clique_57, [0.9597666934819755, 0.8744593911178689, 0.29548052971820926]
+select clique_56, chain  and resi 643 + chain  and resi 644 + chain  and resi 645 + chain  and resi 646 + chain  and resi 647 + chain  and resi 648 + chain  and resi 649 + chain  and resi 829 + chain  and resi 960
+set_color clique_57, [0.11175310961260954, 0.47005948646690343, 0.4526284450112178]
 color clique_57, chain  and resi 693
 show spheres, chain  and resi 693 and (name CA or name C5')
 color clique_57, chain  and resi 719
@@ -1422,7 +1478,8 @@ color clique_57, chain  and resi 727
 show spheres, chain  and resi 727 and (name CA or name C5')
 color clique_57, chain  and resi 1018
 show spheres, chain  and resi 1018 and (name CA or name C5')
-set_color clique_58, [0.9331931774317914, 0.127809960064854, 0.7910187985773872]
+select clique_57, chain  and resi 693 + chain  and resi 719 + chain  and resi 720 + chain  and resi 721 + chain  and resi 722 + chain  and resi 723 + chain  and resi 724 + chain  and resi 727 + chain  and resi 1018
+set_color clique_58, [0.3773548978449389, 0.8275578089689619, 0.5556507282664235]
 color clique_58, chain  and resi 1150
 show spheres, chain  and resi 1150 and (name CA or name C5')
 color clique_58, chain  and resi 1151
@@ -1441,7 +1498,8 @@ color clique_58, chain  and resi 1159
 show spheres, chain  and resi 1159 and (name CA or name C5')
 color clique_58, chain  and resi 1160
 show spheres, chain  and resi 1160 and (name CA or name C5')
-set_color clique_59, [0.062018515392475604, 0.4742087172135735, 0.42283683447857756]
+select clique_58, chain  and resi 1150 + chain  and resi 1151 + chain  and resi 1152 + chain  and resi 1153 + chain  and resi 1154 + chain  and resi 1157 + chain  and resi 1158 + chain  and resi 1159 + chain  and resi 1160
+set_color clique_59, [0.16906691490069392, 0.6440124328062574, 0.005519611825145931]
 color clique_59, chain  and resi 7
 show spheres, chain  and resi 7 and (name CA or name C5')
 color clique_59, chain  and resi 8
@@ -1458,7 +1516,8 @@ color clique_59, chain  and resi 288
 show spheres, chain  and resi 288 and (name CA or name C5')
 color clique_59, chain  and resi 289
 show spheres, chain  and resi 289 and (name CA or name C5')
-set_color clique_60, [0.6420569098070769, 0.8486287438289396, 0.625150713292636]
+select clique_59, chain  and resi 7 + chain  and resi 8 + chain  and resi 9 + chain  and resi 10 + chain  and resi 286 + chain  and resi 287 + chain  and resi 288 + chain  and resi 289
+set_color clique_60, [0.0385408553606178, 0.1644005641355284, 0.6232516911832362]
 color clique_60, chain  and resi 41
 show spheres, chain  and resi 41 and (name CA or name C5')
 color clique_60, chain  and resi 42
@@ -1475,7 +1534,8 @@ color clique_60, chain  and resi 253
 show spheres, chain  and resi 253 and (name CA or name C5')
 color clique_60, chain  and resi 254
 show spheres, chain  and resi 254 and (name CA or name C5')
-set_color clique_61, [0.9553816562306009, 0.9516912775427996, 0.10968358920960708]
+select clique_60, chain  and resi 41 + chain  and resi 42 + chain  and resi 43 + chain  and resi 44 + chain  and resi 251 + chain  and resi 252 + chain  and resi 253 + chain  and resi 254
+set_color clique_61, [0.45967691569599456, 0.016536158202400397, 0.8472307129123865]
 color clique_61, chain  and resi 52
 show spheres, chain  and resi 52 and (name CA or name C5')
 color clique_61, chain  and resi 53
@@ -1492,7 +1552,8 @@ color clique_61, chain  and resi 242
 show spheres, chain  and resi 242 and (name CA or name C5')
 color clique_61, chain  and resi 243
 show spheres, chain  and resi 243 and (name CA or name C5')
-set_color clique_62, [0.33175395453883316, 0.4813635938488463, 0.313806923014049]
+select clique_61, chain  and resi 52 + chain  and resi 53 + chain  and resi 54 + chain  and resi 55 + chain  and resi 240 + chain  and resi 241 + chain  and resi 242 + chain  and resi 243
+set_color clique_62, [0.06956521391834736, 0.8225635756867629, 0.9681854616453532]
 color clique_62, chain  and resi 58
 show spheres, chain  and resi 58 and (name CA or name C5')
 color clique_62, chain  and resi 59
@@ -1509,7 +1570,8 @@ color clique_62, chain  and resi 315
 show spheres, chain  and resi 315 and (name CA or name C5')
 color clique_62, chain  and resi 316
 show spheres, chain  and resi 316 and (name CA or name C5')
-set_color clique_63, [0.7188194512763731, 0.6005990251162221, 0.9135782994089319]
+select clique_62, chain  and resi 58 + chain  and resi 59 + chain  and resi 235 + chain  and resi 312 + chain  and resi 313 + chain  and resi 314 + chain  and resi 315 + chain  and resi 316
+set_color clique_63, [0.7122061686699878, 0.09701427310141808, 0.01942604311417151]
 color clique_63, chain  and resi 86
 show spheres, chain  and resi 86 and (name CA or name C5')
 color clique_63, chain  and resi 87
@@ -1526,7 +1588,8 @@ color clique_63, chain  and resi 208
 show spheres, chain  and resi 208 and (name CA or name C5')
 color clique_63, chain  and resi 209
 show spheres, chain  and resi 209 and (name CA or name C5')
-set_color clique_64, [0.525699090658169, 0.3035973266909662, 0.16862371292803424]
+select clique_63, chain  and resi 86 + chain  and resi 87 + chain  and resi 88 + chain  and resi 89 + chain  and resi 206 + chain  and resi 207 + chain  and resi 208 + chain  and resi 209
+set_color clique_64, [0.1190110939875525, 0.6709276132356269, 0.4560648864947444]
 color clique_64, chain  and resi 92
 show spheres, chain  and resi 92 and (name CA or name C5')
 color clique_64, chain  and resi 93
@@ -1543,7 +1606,8 @@ color clique_64, chain  and resi 202
 show spheres, chain  and resi 202 and (name CA or name C5')
 color clique_64, chain  and resi 203
 show spheres, chain  and resi 203 and (name CA or name C5')
-set_color clique_65, [0.8213376048702985, 0.5654924511081226, 0.7896338922063262]
+select clique_64, chain  and resi 92 + chain  and resi 93 + chain  and resi 94 + chain  and resi 95 + chain  and resi 200 + chain  and resi 201 + chain  and resi 202 + chain  and resi 203
+set_color clique_65, [0.8769619504046147, 0.4064473997706327, 0.09351974879678804]
 color clique_65, chain  and resi 124
 show spheres, chain  and resi 124 and (name CA or name C5')
 color clique_65, chain  and resi 125
@@ -1560,7 +1624,8 @@ color clique_65, chain  and resi 169
 show spheres, chain  and resi 169 and (name CA or name C5')
 color clique_65, chain  and resi 170
 show spheres, chain  and resi 170 and (name CA or name C5')
-set_color clique_66, [0.2512554571304285, 0.12431838651413407, 0.42438865036986706]
+select clique_65, chain  and resi 124 + chain  and resi 125 + chain  and resi 126 + chain  and resi 127 + chain  and resi 167 + chain  and resi 168 + chain  and resi 169 + chain  and resi 170
+set_color clique_66, [0.15324502248136473, 0.1342008105482153, 0.45254459969699135]
 color clique_66, chain  and resi 131
 show spheres, chain  and resi 131 and (name CA or name C5')
 color clique_66, chain  and resi 132
@@ -1577,7 +1642,8 @@ color clique_66, chain  and resi 164
 show spheres, chain  and resi 164 and (name CA or name C5')
 color clique_66, chain  and resi 165
 show spheres, chain  and resi 165 and (name CA or name C5')
-set_color clique_67, [0.22448856109498505, 0.79468845362318, 0.1541205714209919]
+select clique_66, chain  and resi 131 + chain  and resi 132 + chain  and resi 133 + chain  and resi 134 + chain  and resi 162 + chain  and resi 163 + chain  and resi 164 + chain  and resi 165
+set_color clique_67, [0.09492098467900889, 0.9195281852757577, 0.7317297323088212]
 color clique_67, chain  and resi 135
 show spheres, chain  and resi 135 and (name CA or name C5')
 color clique_67, chain  and resi 136
@@ -1594,7 +1660,8 @@ color clique_67, chain  and resi 159
 show spheres, chain  and resi 159 and (name CA or name C5')
 color clique_67, chain  and resi 160
 show spheres, chain  and resi 160 and (name CA or name C5')
-set_color clique_68, [0.6819339298677269, 0.4926362169107402, 0.6777744513838392]
+select clique_67, chain  and resi 135 + chain  and resi 136 + chain  and resi 137 + chain  and resi 138 + chain  and resi 157 + chain  and resi 158 + chain  and resi 159 + chain  and resi 160
+set_color clique_68, [0.08492370376344271, 0.8009711479289287, 0.9651670334404967]
 color clique_68, chain  and resi 853
 show spheres, chain  and resi 853 and (name CA or name C5')
 color clique_68, chain  and resi 854
@@ -1611,7 +1678,8 @@ color clique_68, chain  and resi 937
 show spheres, chain  and resi 937 and (name CA or name C5')
 color clique_68, chain  and resi 938
 show spheres, chain  and resi 938 and (name CA or name C5')
-set_color clique_69, [0.6572991381957541, 0.12737489174157635, 0.11894740927516512]
+select clique_68, chain  and resi 853 + chain  and resi 854 + chain  and resi 855 + chain  and resi 857 + chain  and resi 858 + chain  and resi 862 + chain  and resi 937 + chain  and resi 938
+set_color clique_69, [0.6589719158726488, 0.2707396582099163, 0.08942789790754824]
 color clique_69, chain  and resi 11
 show spheres, chain  and resi 11 and (name CA or name C5')
 color clique_69, chain  and resi 12
@@ -1626,7 +1694,8 @@ color clique_69, chain  and resi 283
 show spheres, chain  and resi 283 and (name CA or name C5')
 color clique_69, chain  and resi 284
 show spheres, chain  and resi 284 and (name CA or name C5')
-set_color clique_70, [0.7391393715061598, 0.8383675391776254, 0.23282338836584515]
+select clique_69, chain  and resi 11 + chain  and resi 12 + chain  and resi 13 + chain  and resi 281 + chain  and resi 282 + chain  and resi 283 + chain  and resi 284
+set_color clique_70, [0.885388419629771, 0.48965341795897455, 0.6318575972869334]
 color clique_70, chain  and resi 66
 show spheres, chain  and resi 66 and (name CA or name C5')
 color clique_70, chain  and resi 67
@@ -1641,7 +1710,8 @@ color clique_70, chain  and resi 332
 show spheres, chain  and resi 332 and (name CA or name C5')
 color clique_70, chain  and resi 334
 show spheres, chain  and resi 334 and (name CA or name C5')
-set_color clique_71, [0.7178754743262601, 0.4617598073492293, 0.9267263365448852]
+select clique_70, chain  and resi 66 + chain  and resi 67 + chain  and resi 329 + chain  and resi 330 + chain  and resi 331 + chain  and resi 332 + chain  and resi 334
+set_color clique_71, [0.1142093264597005, 0.7606735030689951, 0.6822994858926003]
 color clique_71, chain  and resi 72
 show spheres, chain  and resi 72 and (name CA or name C5')
 color clique_71, chain  and resi 73
@@ -1656,7 +1726,8 @@ color clique_71, chain  and resi 221
 show spheres, chain  and resi 221 and (name CA or name C5')
 color clique_71, chain  and resi 222
 show spheres, chain  and resi 222 and (name CA or name C5')
-set_color clique_72, [0.5648560344799154, 0.42748694333317716, 0.8289947983246511]
+select clique_71, chain  and resi 72 + chain  and resi 73 + chain  and resi 74 + chain  and resi 75 + chain  and resi 220 + chain  and resi 221 + chain  and resi 222
+set_color clique_72, [0.8703479030637106, 0.6210828067837825, 0.8642184826427466]
 color clique_72, chain  and resi 110
 show spheres, chain  and resi 110 and (name CA or name C5')
 color clique_72, chain  and resi 111
@@ -1671,7 +1742,8 @@ color clique_72, chain  and resi 183
 show spheres, chain  and resi 183 and (name CA or name C5')
 color clique_72, chain  and resi 184
 show spheres, chain  and resi 184 and (name CA or name C5')
-set_color clique_73, [0.38382350093301876, 0.3117546905157236, 0.48084899943274917]
+select clique_72, chain  and resi 110 + chain  and resi 111 + chain  and resi 112 + chain  and resi 113 + chain  and resi 182 + chain  and resi 183 + chain  and resi 184
+set_color clique_73, [0.10616519977543726, 0.1246478342656746, 0.9796013139691399]
 color clique_73, chain  and resi 114
 show spheres, chain  and resi 114 and (name CA or name C5')
 color clique_73, chain  and resi 261
@@ -1680,7 +1752,8 @@ color clique_73, chain  and resi 572
 show spheres, chain  and resi 572 and (name CA or name C5')
 color clique_73, chain  and resi 1059
 show spheres, chain  and resi 1059 and (name CA or name C5')
-set_color clique_74, [0.6274639935120436, 0.07675453526195308, 0.5556134053349968]
+select clique_73, chain  and resi 114 + chain  and resi 261 + chain  and resi 572 + chain  and resi 1059
+set_color clique_74, [0.940257180183891, 0.9408557548063862, 0.7696745784848456]
 color clique_74, chain  and resi 193
 show spheres, chain  and resi 193 and (name CA or name C5')
 color clique_74, chain  and resi 194
@@ -1689,13 +1762,15 @@ color clique_74, chain  and resi 680
 show spheres, chain  and resi 680 and (name CA or name C5')
 color clique_74, chain  and resi 917
 show spheres, chain  and resi 917 and (name CA or name C5')
-set_color clique_75, [0.6138811424916509, 0.8645030125955306, 0.03787196607409371]
+select clique_74, chain  and resi 193 + chain  and resi 194 + chain  and resi 680 + chain  and resi 917
+set_color clique_75, [0.6602103469631951, 0.7351008644922143, 0.1128449529373392]
 color clique_75, chain  and resi 103
 show spheres, chain  and resi 103 and (name CA or name C5')
 color clique_75, chain  and resi 189
 show spheres, chain  and resi 189 and (name CA or name C5')
 color clique_75, chain  and resi 993
 show spheres, chain  and resi 993 and (name CA or name C5')
+select clique_75, chain  and resi 103 + chain  and resi 189 + chain  and resi 993
 set dash_gap, 0
 set dash_color, grey10
 hide labels

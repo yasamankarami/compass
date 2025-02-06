@@ -1040,3 +1040,4 @@ set dash_gap, 0
 set dash_color, grey10
 bg_color white
 set sphere_transparency, 0.3
+set sphere_scale, 0.5
