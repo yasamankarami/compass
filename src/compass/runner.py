@@ -2,16 +2,14 @@
 """
 Run the computation of descriptors
 """
-# done: change P atoms as NA equivalents to Calpha -> C5'
-# done: noH by default in the min dist calculation
-# todo: remove the Debugging Area
-# todo: compare vs comma
 
 # %%
 import os
 import sys
 import time
 from os.path import join
+from resource import getrusage as resource_usage, RUSAGE_SELF
+from time import time as timestamp
 
 import compass.descriptors.config as cfg
 import compass.descriptors.geometry as geom
@@ -21,127 +19,100 @@ import compass.descriptors.topo_traj as tt
 import compass.network.generals as gn
 
 
-# %%
-
 def runner():
     """
     Entry point for running the compass workflow
     """
-    # %%=======================================================================
+    # =========================================================================
     # 1. Prelude
     # =========================================================================
+    start_time, start_resources = timestamp(), resource_usage(RUSAGE_SELF)
+    first_timer = time.time()
     # Parse configuration file
     if len(sys.argv) != 2:
         raise ValueError(
             '\ncompass syntax is: compass path-to-config-file')
     config_path = sys.argv[1]
-    # config_path = "/home/rglez/RoyHub/compass/example/params.cfg"
-    first_timer = time.time()
     arg, dict_arg = cfg.parse_params(config_path)
-    #map_file = join(dict_arg["generals"]["output_dir"],'_map_file.txt')
-    # Prepare datastructures & containers
-    
+
+    # Prepare data structures
     (mini_traj, trajs, resids_to_atoms, resids_to_noh, calphas, oxy, nitro,
-     donors, hydros, acceptors, corr_indices) = tt.prepare_datastructures(arg, first_timer)
-    #print("corr indices",corr_indices)
-    ## %%=======================================================================
-    ## 2. Compute descriptors
-    ## =========================================================================
-    ave_min_dist, occ_nb, cp, occ_sb, occ_hb, occ_int, mi, gc = \
-        mm.compute_descriptors(mini_traj, trajs, arg, resids_to_atoms,
-                               resids_to_noh, calphas, oxy, nitro, donors,
-                               hydros, acceptors, corr_indices, first_timer)
-    ## invert CP matrix
+     donors, hydros, acceptors, corr_indices) = tt.prepare_datastructures(
+        arg, first_timer)
+
+    # =========================================================================
+    # 2. Compute descriptors
+    # =========================================================================
+    (ave_min_dist, occ_nb, cp, occ_sb, occ_hb, occ_int, mi,
+     gc) = mm.compute_descriptors(mini_traj, trajs, arg, resids_to_atoms,
+                                  resids_to_noh, calphas, oxy, nitro, donors,
+                                  hydros, acceptors, corr_indices, first_timer)
+    # invert CP matrix
     cp = abs(cp - max(cp))
-    #cp = abs(cp - 1)
-    ## %%=======================================================================
-    ## 3. Save matrices
-    ## =========================================================================
+
+    # =========================================================================
+    # 3. Save matrices
+    # =========================================================================
     n = len(resids_to_atoms)
-    matrices, matrices_names = \
-        geom.process_matrices(arg, n, calphas, ave_min_dist, occ_nb, cp,
-                             occ_sb, occ_hb, occ_int, mi, gc, first_timer)
+    matrices, matrices_names = geom.process_matrices(
+        arg, n, calphas, ave_min_dist, occ_nb, cp, occ_sb, occ_hb, occ_int, mi,
+        gc, first_timer)
 
-    ## %%=======================================================================
-    ## 4. Perform PCA & generate adjacency matrix from PCA results
-    ## =========================================================================
-
-    ## Select the matrices to be used in the PCA
+    # =========================================================================
+    # 4. Perform PCA & generate adjacency matrix from PCA results
+    # =========================================================================
+    # Select the matrices to be used in the PCA
     adj_name = pca.run_pca(arg, matrices, n, first_timer)
-    
-    # %%=======================================================================
+
+    # =========================================================================
     # 5. Perform network analyses
     # =========================================================================
-    
     # Construct graphs
     arg.adjacency_file = adj_name
     arg.min_dist_matrix_file = matrices_names["MINDIST"]
-    
-    #arg.adjacency_file = '/users/sbheemir/september_2024/results/1kx5/matrices/1kx5_ADJACENCY.mat'
-    #arg.min_dist_matrix_file = '/users/sbheemir/september_2024/results/1kx5/matrices/1kx5_MINDIST.mat'
-    arg.pdb_file_path = dict_arg["generals"]["topology"]
+    arg.pdb_file_path = arg.topo
     arg.network_dir = join(dict_arg["generals"]["output_dir"], 'network')
     os.makedirs(arg.network_dir, exist_ok=True)
-    dist_cutoffs = [dict_arg["distance cutoffs"]["Graph"],dict_arg["distance cutoffs"]["Cliques"]]
-    
-    #print(dist_cutoffs)
+    dist_cutoffs = [dict_arg["distance cutoffs"]["Graph"],
+                    dict_arg["distance cutoffs"]["Cliques"]]
+
+    # print(dist_cutoffs)
     gn.process_graphs(arg, dist_cutoffs)
-    print(f' ⏳  Until graphs construction: {round(time.time() - first_timer, 2)} s')
-    
+    graph_time = round(time.time() - first_timer, 2)
+    print(f' ⏳  Until graphs construction: {graph_time} s')
+
     # Compute network parameters
-    gn.process_graph_files(arg.network_dir,dist_cutoffs[0] )
-    # Find alternative paths for a specific graph
-    # graph, atom_mapping = rf.ReadFiles().load_graph_and_mapping('path_to_graph_file.json')
-    # alternative_paths = network_parameters.find_alternative_paths(graph, atom_mapping, 'source_residue', 'target_residue')
-    print(f' ⏳  Until network parameters computed: {round(time.time() - first_timer, 2)} s')
+    gn.process_graph_files(arg.network_dir, dist_cutoffs[0])
+    network_time = round(time.time() - first_timer, 2)
+    print(f' ⏳  Until network parameters computed: {network_time} s')
 
     # Compute communities and cliques
-    # method = input("Select community detection method ('leiden' or 'girvan'): ").strip().lower()
-    gn.process_graph_files_for_communities_and_cliques(arg.network_dir, dist_cutoffs[0],dist_cutoffs[1] )
-    print(f' ⏳  Until communities and cliques detection: {round(time.time() - first_timer, 2)} s')
+    gn.process_graph_files_for_communities_and_cliques(arg.network_dir,
+                                                       dist_cutoffs[0],
+                                                       dist_cutoffs[1])
+    clique_time = round(time.time() - first_timer, 2)
+    print(f' ⏳  Until communities and cliques detection: {clique_time} s')
 
-    # =============================================================================
+    # =========================================================================
     # 6. Generate PyMOL scripts
-    # =============================================================================1
-    gn.generate_pymol_scripts(arg.network_dir, arg.pdb_file_path, dist_cutoffs[0],dist_cutoffs[1])
-    #print(dict_arg["paths"]["find_path"])
+    # =========================================================================
+    gn.generate_pymol_scripts(arg.network_dir, arg.pdb_file_path,
+                              dist_cutoffs[0], dist_cutoffs[1])
     if dict_arg["paths"]["find_path"] == 'True':
-        source_residues = dict_arg["paths"]["sources"].split(",")  # Convert comma-separated string to list
-        target_residues = dict_arg["paths"]["targets"].split(",")  # Convert comma-separated string to list
-    
+        source_residues = dict_arg["paths"]["sources"].split(",")
+        target_residues = dict_arg["paths"]["targets"].split(",")
+
         for source_residue in source_residues:
             for target_residue in target_residues:
-                #print(f"Finding path between {source_residue} and {target_residue}")
-                gn.find_paths(arg.pdb_file_path, arg.network_dir, dist_cutoffs[0], source_residue.strip(), target_residue.strip())
+                gn.find_paths(arg.pdb_file_path, arg.network_dir,
+                              dist_cutoffs[0], source_residue.strip(),
+                              target_residue.strip())
 
-    '''
-    if dict_arg["paths"]["find_path"] == 'True':
-        source_residue = dict_arg["paths"]["source"]
-        target_residue = dict_arg["paths"]["target"]
-        #print(source_residue, target_residue)
-        gn.find_paths(arg.pdb_file_path,arg.network_dir,dist_cutoffs[0],source_residue,target_residue)
-    '''
-    print(f' ⏳  Until pymol scripts generation: {round(time.time() - first_timer, 2)} s')
+    end_resources, end_time = resource_usage(RUSAGE_SELF), timestamp()
+    real_time = end_time - start_time
+    user_time = end_resources.ru_utime - start_resources.ru_utime
+    system_time = end_resources.ru_stime - start_resources.ru_stime
+    print(f" ⏳  User Time: {user_time:.2f} seconds")
+    print(f" ⏳  System Time: {system_time:.2f} seconds")
+    print(f" ⏳  Wall Clock Time: {real_time:.2f} seconds")
     print(f"**** -------Normal Termination -------****")
-
-# =============================================================================
-# Debugging Area (to be removed)
-# =============================================================================
-# import mdtraj as md
-# topology = '/home/rglez/RoyHub/compass/data/MDs/nucleosome_full_2c/1kx5_dry.pdb'
-# trajectory = '/home/rglez/RoyHub/compass/data/MDs/nucleosome_full_2c/nuc-prot-trim.dcd'
-# trajectory = md.load(trajectory, top=topology)
-#
-# ca_atoms = trajectory.topology.select("name CA")
-#
-# # Select C5' as backbone atoms of the nucleic acids
-# dna = "(resname =~ '(5|3)?D([ATGC]){1}(3|5)?$')"
-# rna = "(resname =~ '(3|5)?R?([AUGC]){1}(3|5)?$')"
-# p_atoms = trajectory.topology.select(f'name "C5\'"')
-#
-# p_atoms = trajectory.topology.select(f'({dna} or {rna}) and name "C5\'"')
-# nucleic = trajectory.topology.select(f'({dna} or {rna})')
-#
-# p_atoms.size
-# trajectory.n_residues
-# trajectory.n_atoms

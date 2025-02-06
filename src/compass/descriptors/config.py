@@ -2,6 +2,7 @@
 import configparser
 import os
 from argparse import Namespace
+from os.path import dirname, join, normpath
 
 allowed_params = {
     "generals": {"topology", "trajectory", "output_dir", "n_cores",
@@ -9,8 +10,9 @@ allowed_params = {
     "non_bond": {"non_bond_cut"},
     "salt_bridges": {"NO_cut"},
     "hbonds": {"DA_cut", "HA_cut", "DHA_cut", "heavy"},
-    "distance cutoffs":{"Graph","Cliques"},
-    "paths":{"find_path","sources","targets"}
+    # "network": {"mindist_matrix", "adjacency_matrix"},
+    "distance cutoffs": {"Graph", "Cliques"},
+    "paths": {"find_path", "sources", "targets"}
 }
 
 allowed_heavies = {"S", "N", "O"}
@@ -90,11 +92,14 @@ def parse_params(config_path):
     config_obj = read_config_file(config_path)
     param_dict = check_config(config_obj)
     param_space = Namespace()
+    root_dir = dirname(config_path)
 
     # General params
-    param_space.topo = param_dict["generals"]["topology"]
-    param_space.traj = param_dict["generals"]["trajectory"]
-    param_space.out_dir = param_dict["generals"]["output_dir"]
+    # param_space.topo = param_dict["generals"]["topology"]
+    topology = param_dict["generals"]["topology"]
+    out_dir = param_dict["generals"]["output_dir"]
+    param_space.out_dir = normpath(join(root_dir, out_dir))
+    param_space.topo = normpath(join(root_dir, topology))
     param_space.n_cores = int(param_dict["generals"]["n_cores"])
     param_space.title = param_dict["generals"]["job_name"]
 
@@ -105,12 +110,12 @@ def parse_params(config_path):
     param_space.ha_cut = float(param_dict["hbonds"]["HA_cut"])
     param_space.dha_cut = float(param_dict["hbonds"]["DHA_cut"])
     param_space.heavies = set(param_dict["hbonds"]["heavy"].split())
-    
-    #Distance cutoffs
+
+    # Distance cutoffs
     param_space.dist_graph = float(param_dict["distance cutoffs"]["Graph"])
     param_space.dist_clique = float(param_dict["distance cutoffs"]["Cliques"])
 
-    #alternative paths between residues
+    # alternative paths between residues
     param_space.find_path = str(param_dict["paths"]["find_path"])
     param_space.source_residue = str(param_dict["paths"]["sources"])
     param_space.target_residue = str(param_dict["paths"]["targets"])
@@ -124,7 +129,11 @@ def parse_params(config_path):
     # Check path existence
     if not os.path.exists(param_space.topo):
         raise FileNotFoundError(f"Topology file not found: {param_space.topo}")
-    for x in param_space.traj.split():
+
+    traj = param_dict["generals"]["trajectory"]
+    trajs = [normpath(join(root_dir, x)) for x in traj.split()]
+    param_space.traj = " ".join(trajs)
+    for x in trajs:
         if not os.path.exists(x):
             raise FileNotFoundError(f"Trajectory file not found: {x}")
     if not os.path.exists(param_space.out_dir):

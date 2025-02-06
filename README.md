@@ -1,9 +1,9 @@
-# compass
+# Background
 
-> Understanding Communication Networks in MD of Protein-NA Complexes 
+> Understanding Communication Networks in Molecular Complexes 
 
 
-**compass** is a user-friendly Python package that ... For a comprehensive introduction, please refer to the following [paper]().
+**compass** is an advanced computational tool that analyzes the communication networks between protein-protein and protein-nucleic acid complexes. It leverages molecular dynamics (MD) simulation data to extract essential inter-residue properties, including dynamical correlations, interactions, and distances. For a comprehensive methodological introduction, please refer to the following [paper]().
 
 
 ## Installation
@@ -17,7 +17,7 @@ The installation of **compass** is straightforward. Just type the following comm
 ````
    
 ## Basic usage
-**compass** is a command-line tool that requires only the path to a well-structured configuration file (refer to the documentation for instructions on preparing it). You can run it using the following command:
+As a command-line tool, **compass** requires only the path to a well-structured configuration file (refer to the [documentation](#documentation) for instructions on preparing it). Once installed, you can run it using the following command:
 
 ```bash
    compass path-to-config-file.cfg
@@ -32,12 +32,11 @@ If you are interested in contributing to the project, please review the guidelin
 
 
 ## License
-This project is licensed under the MIT License. For more details, check the [LICENSE](LICENSE.txt) file.
+This project is licensed under the BSD 3-Clause License. For more details, check the [LICENSE](LICENSE) file.
 
 
-## Citing compass
-
-As academic researchers, we depend on citations to justify the time spent developing software. If you use **compass** in your research,  give us a pat on the back by citing the following paper:
+## Citation
+If you use **compass** in your research, please let us knoow by citing the following paper::
 
 ```
 (soon available)
