@@ -9,12 +9,8 @@ allowed_params = {
     "non_bond": {"non_bond_cut"},
     "salt_bridges": {"NO_cut"},
     "hbonds": {"DA_cut", "HA_cut", "DHA_cut", "heavy"},
-<<<<<<< HEAD
-    "network": {"mindist_matrix", "adjacency_matrix"},
-=======
     "distance cutoffs":{"Graph","Cliques"},
     "paths":{"find_path","sources","targets"}
->>>>>>> network_modifications
 }
 
 allowed_heavies = {"S", "N", "O"}

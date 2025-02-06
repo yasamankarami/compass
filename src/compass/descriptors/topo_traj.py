@@ -105,7 +105,7 @@ def prepare_datastructures(arg, first_timer):
     
     prep_time = round(time.time() - first_timer, 2)
     print(f" 📋 System details: number of trajectories are {len(trajs)}")
-    print(f" 📋 System details: number of backbone atoms are {len(calphas)}")
+    print(f" 📋 System details: number of residues are {len(calphas)}")
     print(f" ⏱️  Until datastructures prepared: {prep_time} s")
 
     return (

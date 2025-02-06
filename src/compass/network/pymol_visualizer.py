@@ -101,15 +101,20 @@ class PyMOLVisualizer:
             # Apply colors to residues based on community assignment
             for community, nodes in communities.items():
                 color = f"color{community}"
+                selection_name = f"community{community}"
                 nodes = [num for num in nodes[0].split(',')]
+                selection_criteria = []
                 for node in nodes:
                     chain_id, res_num = node.split('_')[:2]  # Splitting on '_' and assuming chain_id and res_num are in this format
                     if chain_id:  # If chain_id is not empty
-                        f.write(f"color {color}, chain {chain_id} and resi {res_num}\n")
+                        selection_criteria.append(f"chain {chain_id} and resi {res_num}")
+                        #f.write(f"color {color}, chain {chain_id} and resi {res_num}\n")
                     else:  # If there's no chain_id (for standalone residues?)
-                        f.write(f"color {color}, resi {res_num}\n")
+                        selection_criteria.append(f"resi {res_num}")
+                        #f.write(f"color {color}, resi {res_num}\n")
                         # Show the structure as cartoon
-
+                f.write(f"select {selection_name}, " + " or ".join(selection_criteria) + "\n")
+                f.write(f"color {color}, {selection_name}\n")
             f.write("show cartoon\n")
             f.write("bg_color white\n")
 
@@ -167,6 +172,7 @@ class PyMOLVisualizer:
                 for node in nodes:
                     chain_id, res_num = node.split('_')[:2]
                     res_num = int(res_num.strip().replace(',', ''))
+                    selection_residues.append(f"chain {chain_id} and resi {res_num}")
                     f.write(f"color clique_{i}, chain {chain_id} and resi {res_num}\n")
                     f.write(f"show spheres, chain {chain_id} and resi {res_num} and (name CA or name C5')\n")
                 # Combine all residue selections into one command
@@ -431,6 +437,7 @@ class PyMOLVisualizer:
                 f.write("set dash_color, grey10\n")
                 f.write("bg_color white\n")
                 f.write("set sphere_transparency, 0.3\n")
+                f.write("set sphere_scale, 0.5\n")
             
             print(f"🧊 PyMOL script for top shortest paths saved to {output_pml_file}")
         except Exception as e:

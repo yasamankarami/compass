@@ -1,6 +1,7 @@
 # Created by rglez at 9/13/24
 import os
 import time
+import shutil
 import json
 import networkx as nx
 from compass.network.graph_constructor import GraphConstructor
@@ -168,10 +169,12 @@ def generate_pymol_scripts(results_dir, pdb_file, dist_cutoff_graph, dist_cutoff
             edge_betweenness_file = os.path.join(results_dir,f"{prefix}_edge_betweenness.txt")
             top_nodes_file = os.path.join(results_dir,f"{prefix}_top_5_percent_nodes.txt")
             paths_file = os.path.join(results_dir, f"{prefix}_paths.txt")
-            output_pml_file = os.path.join(results_dir, f"{prefix}_top_5_percent.pml")
+            output_pml_file = os.path.join(results_dir, f"{prefix}_top_5_hotspot.pml")
             output_pml_communities = os.path.join(results_dir,f"{prefix}_communities.pml")
             output_top_paths = os.path.join(results_dir,f"{prefix}_top_paths.pml")
             top_15_file = os.path.join(results_dir,f"{prefix}_top_10_shortest_paths.txt")
+            pdb_output_path = os.path.join(results_dir,os.path.basename(pdb_file))
+            shutil.copy(pdb_file, pdb_output_path)
 
             # Initialize PyMOLVisualizer
             visualizer = PyMOLVisualizer(pdb_file=pdb_file,atom_mapping=atom_mapping,graph=graph)
