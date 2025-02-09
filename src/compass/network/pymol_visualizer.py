@@ -95,7 +95,7 @@ class PyMOLVisualizer:
 
         with open(output_pml_file, 'w') as f:
             # Write the command to load the structure
-            f.write(f"load {self.pdb_file}, structure\n")
+            f.write(f"load {self.pdb_file} \n")
 
             # Define colors for each community
             for community, color in community_colors.items():
@@ -159,7 +159,7 @@ class PyMOLVisualizer:
 
         # Assign a unique color to each clique and generate PyMOL commands
         with open(output_pml, 'w') as f:
-            f.write(f"load {self.pdb_file}, structure\n")
+            f.write(f"load {self.pdb_file}\n")
             f.write("show cartoon\n")
             f.write("set cartoon_color, grey90\n")
 
@@ -208,7 +208,7 @@ class PyMOLVisualizer:
 
         # Write initial structure loading and visualization commands
         for file in output_files.values():
-            file.write(f"load {self.pdb_file}, structure\n")
+            file.write(f"load {self.pdb_file}\n")
             file.write(f"show_as cartoon, structure\n")
             file.write(f"set cartoon_transparency, 0.6\n")
 
@@ -289,23 +289,26 @@ class PyMOLVisualizer:
 
             # Generate the PyMOL script
             with open(output_pml_file, 'w') as f:
-                f.write(f"load {pdb_file}, structure\n")
+                f.write(f"load {pdb_file}\n")
                 f.write("set cartoon_color, grey90\n")
 
                 # Define a color for the spheres
                 f.write("set_color highlight_color, [1.0, 0.0, 0.0]\n")
+                residue_selections = []
+                #selection_string = "sele hotspot_residues, "
 
                 # Highlight residues as spheres
                 for res_num, chain_id in residue_info:
-                    f.write(
-                        f"select chain {chain_id} and resi {res_num} and (name CA or name C5')\n")
-                    f.write(
-                        f"show spheres, chain {chain_id} and resi {res_num} and (name CA or name C5')\n")
-                    f.write(
-                        f"color highlight_color, chain {chain_id} and resi {res_num}\n")
+                    selection = f"(chain {chain_id} and resi {res_num} and (name CA or name C5'))"
+                    residue_selections.append(selection)
+                    # Show spheres and color each residue
+                    f.write(f"show spheres, {selection}\n")
+                    f.write(f"color highlight_color, {selection}\n")
 
-                f.write(
-                    "set sphere_scale, 0.7\n")  # Adjust sphere size as needed
+                selection_string = f"sele hotspot_residues, {' or '.join(residue_selections)}\n"
+                f.write(selection_string)
+                # Set sphere scale and background color
+                f.write("set sphere_scale, 0.7\n")
                 f.write("bg_color white\n")
 
             print(
@@ -325,7 +328,7 @@ class PyMOLVisualizer:
         """
         with open(output_pml_file, 'w') as f:
             f.write(
-                f"load {self.pdb_file}, structure\n")  # Ensure you replace `pdb_file` with your actual PDB file path
+                f"load {self.pdb_file}\n")  # Ensure you replace `pdb_file` with your actual PDB file path
             f.write("set cartoon_color, grey90\n")
             # Define color and background
             f.write("set_color black, [0.0, 0.0, 0.0]\n")
