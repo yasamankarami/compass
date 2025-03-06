@@ -87,7 +87,13 @@ class GraphConstructor:
             G (nx.Graph): The graph whose edge weights are to be plotted.
             output_file_prefix (str): Prefix for the output histogram file.
         """
-        weights = [data['weight'] for u, v, data in G.edges(data=True)]
+        #weights = [data['weight'] for u, v, data in G.edges(data=True)]
+        weights = []
+        for u, v, data in G.edges(data=True):
+            try:
+                weights.append(data['weight'])
+            except KeyError:
+                weights.append(0)
 
         plt.figure(figsize=(10, 6))
         plt.hist(weights, bins=10, edgecolor='black', alpha=0.7)
