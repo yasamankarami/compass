@@ -39,5 +39,5 @@ This project is licensed under the BSD 3-Clause License. For more details, check
 If you use **compass** in your research, please let us knoow by citing the following paper::
 
 ```
-(soon available)
+Bheemireddy S, González Alemán R, Bignon E, Karami Y. Communication pathway analysis within protein-nucleic acid complexes. bioRxiv. 2025:2025-02.
 ```
