@@ -3,7 +3,7 @@
 > Understanding Communication Networks in Molecular Complexes 
 
 
-**compass** is an advanced computational tool that analyzes the communication networks between protein-protein and protein-nucleic acid complexes. It leverages molecular dynamics (MD) simulation data to extract essential inter-residue properties, including dynamical correlations, interactions, and distances. For a comprehensive methodological introduction, please refer to the following [paper]().
+**compass** is an advanced computational tool that analyzes the communication networks between protein-protein and protein-nucleic acid complexes. It leverages molecular dynamics (MD) simulation data to extract essential inter-residue properties, including dynamical correlations, interactions, and distances. For a comprehensive methodological introduction, please refer to the following [paper](https://doi.org/10.1101/2025.02.14.638259).
 
 
 ## Installation
