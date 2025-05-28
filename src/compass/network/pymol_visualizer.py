@@ -102,18 +102,21 @@ class PyMOLVisualizer:
                 f.write(
                     f"set_color color{community}, [{', '.join(map(str, color))}]\n")
             # Apply colors to residues based on community assignment
-            for community, nodes in communities.items():
+            for i, (community, nodes) in enumerate(communities.items()):
+                community_residues = []
                 color = f"color{community}"
                 nodes = [num for num in nodes[0].split(',')]
                 for node in nodes:
-                    chain_id, res_num = node.split('_')[
-                                        :2]  # Splitting on '_' and assuming chain_id and res_num are in this format
+                    chain_id, res_num = node.split('_')[:2]  # Splitting on '_' and assuming chain_id and res_num are in this format
                     if chain_id:  # If chain_id is not empty
-                        f.write(
-                            f"color {color}, chain {chain_id} and resi {res_num}\n")
+                        f.write(f"color {color}, chain {chain_id} and resi {res_num}\n")
+                        community_residues.append(f"chain {chain.id} and resi {res_num}")
                     else:  # If there's no chain_id (for standalone residues?)
                         f.write(f"color {color}, resi {res_num}\n")
+                        community_residues.append(f"resi {res_num}")
                         # Show the structure as cartoon
+                if community_residues:
+                    f.write(f"select community_{i}, {' + '.join(community_residues)}\n")
 
             f.write("show cartoon\n")
             f.write("bg_color white\n")
