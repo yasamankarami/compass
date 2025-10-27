@@ -110,7 +110,7 @@ class PyMOLVisualizer:
                     chain_id, res_num = node.split('_')[:2]  # Splitting on '_' and assuming chain_id and res_num are in this format
                     if chain_id:  # If chain_id is not empty
                         f.write(f"color {color}, chain {chain_id} and resi {res_num}\n")
-                        community_residues.append(f"chain {chain.id} and resi {res_num}")
+                        community_residues.append(f"chain {chain_id} and resi {res_num}")
                     else:  # If there's no chain_id (for standalone residues?)
                         f.write(f"color {color}, resi {res_num}\n")
                         community_residues.append(f"resi {res_num}")
