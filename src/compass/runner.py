@@ -9,7 +9,7 @@ import time
 from os.path import join
 from resource import getrusage as resource_usage, RUSAGE_SELF
 from time import time as timestamp
-
+import sys
 import mdtraj as md
 
 import compass.descriptors.config as cfg
