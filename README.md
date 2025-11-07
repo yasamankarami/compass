@@ -10,7 +10,7 @@
 The installation of **compass** is straightforward. Just type the following commands in your terminal (assuming you've got Anaconda or Miniconda up and running):
 
 ```bash
-   git clone https://github.com/rglez/compass.git
+   git clone https://github.com/yasamankarami/compass.git
    cd compass
    conda env create -f environment.yml
    conda activate compass  
