@@ -174,18 +174,16 @@ for cycle in cycles:
 resids_to_rings = tt.pydict_to_numbadict(resids_to_rings_raw)
 
 # =============================================================================
-#
+# =========================== COMPUTE INTERACTIONS ============================
 # =============================================================================
 from numba import njit, prange
 
 
 @njit
 def calc_normal_vector(p1, p2, p3):
-    # Calculate vectors from points
+    """Calculate normal vector for a single ring"""
     v1 = p2 - p1
     v2 = p3 - p1
-
-    # Calculate the normal vector
     normal = np.cross(v1, v2)
     norm = np.linalg.norm(normal)
 
@@ -197,42 +195,74 @@ def calc_normal_vector(p1, p2, p3):
 
 @njit
 def calc_ring_center(ring):
-    center = np.zeros(3)
-    for atom in ring:
-        center += atom
-    return center / len(ring)
+    """Calculate center for a single ring"""
+    return np.mean(ring, axis=0)
 
 
 @njit(parallel=True)
-def detect_stacking(rings):
+def calc_all_normals(rings):
+    """Vectorized calculation of all normal vectors"""
     num_rings = len(rings)
+    normals = np.empty((num_rings, 3))
+
+    for i in prange(num_rings):
+        normals[i] = calc_normal_vector(rings[i][0], rings[i][1], rings[i][2])
+
+    return normals
+
+
+@njit(parallel=True)
+def calc_all_centers(rings):
+    """Vectorized calculation of all ring centers"""
+    num_rings = len(rings)
+    centers = np.empty((num_rings, 3))
+
+    for i in prange(num_rings):
+        centers[i] = calc_ring_center(rings[i])
+
+    return centers
+
+
+@njit(parallel=True)
+def detect_stacking(rings, distance_cutoff=5.0, angle_cutoff=30.0):
+    """
+    Vectorized detection of stacking interactions between rings
+
+    Args:
+        rings: array of ring coordinates, shape (num_rings, num_atoms, 3)
+        distance_cutoff: maximum center-to-center distance
+        angle_cutoff: maximum angle deviation from parallel/antiparallel
+
+    Returns:
+        List of tuples (i, j) indicating interacting ring pairs
+    """
+    num_rings = len(rings)
+
+    # Pre-compute all normals and centers
+    normals = calc_all_normals(rings)
+    centers = calc_all_centers(rings)
+
+    # Get upper triangular indices
     interactions = []
 
     for i in prange(num_rings):
         for j in range(i + 1, num_rings):
-            ring1 = rings[i]
-            ring2 = rings[j]
-
-            # Compute normal vectors for both rings
-            normal1 = calc_normal_vector(ring1[0], ring1[1], ring1[2])
-            normal2 = calc_normal_vector(ring2[0], ring2[1], ring2[2])
-
-            # Compute centers of the rings
-            center1 = calc_ring_center(ring1)
-            center2 = calc_ring_center(ring2)
-
             # Calculate distance between ring centers
-            center_dist = np.linalg.norm(center2 - center1)
+            center_diff = centers[j] - centers[i]
+            center_dist = np.linalg.norm(center_diff)
+
+            # Early exit if distance cutoff not met
+            if center_dist >= distance_cutoff:
+                continue
 
             # Calculate angle between normal vectors
-            dot_product = np.dot(normal1, normal2)
-            angle = np.arccos(np.clip(dot_product, -1.0, 1.0))
+            dot_product = np.dot(normals[i], normals[j])
+            dot_product = np.clip(dot_product, -1.0, 1.0)
+            angle = np.arccos(dot_product)
             angle_degrees = np.degrees(angle)
 
-            # Determine if stacking interaction exists
-            if center_dist < 5.0 and (
-                    abs(angle_degrees) < 30 or abs(angle_degrees - 180) < 30
-            ):
+            # Check if parallel (angle ≈ 0) or antiparallel (angle ≈ 180)
+            if abs(angle_degrees) < angle_cutoff or abs(angle_degrees - 180) < angle_cutoff:
                 interactions.append((i, j))
 
     return interactions

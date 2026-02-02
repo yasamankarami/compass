@@ -50,34 +50,7 @@ def calc_min_dist(coords1, coords2):
     return np.sqrt(np.min(dist_squared))
 
 @njit(parallel=False)
-def calc_single_angle(d, h, a):
-    """
-    Computes the angle between three atoms
-
-    Args:
-        d (donor): Coordinates of the first atom (x, y, z)
-        h (hydrogen): Coordinates of the second atom (x, y, z).
-        a (acceptor): Coordinates of the third atom (x, y, z).
-
-    Returns:
-        angle_deg: the angle in degrees
-    """
-    # Compute vectors
-    dh = d - h
-    ah = a - h
-
-    # Compute dot & norms
-    dot_product = np.dot(dh, ah)
-    dh_norm = np.linalg.norm(dh)
-    ah_norm = np.linalg.norm(ah)
-
-    # Compute angle
-    angle_rad = np.arccos(dot_product / (dh_norm * ah_norm))
-    angle_deg = np.rad2deg(angle_rad)
-    return angle_deg
-
-@njit(parallel=False)
-def calc_angles_vectorized(coords_d, coords_h, coords_a):
+def calc_angles(coords_d, coords_h, coords_a):
     """
     Calculate all pairwise D-H-A angles
 
@@ -190,7 +163,7 @@ def find_hb(frame_coords, donors_i, hydros_i, acceptors_j, da_cut, ha_cut, dha_c
 
     # Compute angles only for pairs that passed distance filters
     # Vectorized angle calculation for all pairs
-    angles = calc_angles_vectorized(coords_d, coords_h, coords_a)  # shape: (n1, n2)
+    angles = calc_angles(coords_d, coords_h, coords_a)  # shape: (n1, n2)
 
     # Check if any pair satisfies all criteria
     return np.any(combined_mask & (angles > dha_cut))

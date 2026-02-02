@@ -12,7 +12,7 @@ import topo_traj as tt
 @njit(parallel=True, fastmath=True)
 def calc_gc(n_res, n_frames, R_locators, R, C_i):
     """
-    Compute the mutual information matrix
+    Vectorized computation of the mutual information matrix
 
     Args:
         n_res: number of residues
@@ -23,24 +23,51 @@ def calc_gc(n_res, n_frames, R_locators, R, C_i):
 
     Returns:
         MI: mutual information matrix
+        GC: generalized correlation matrix
     """
     k = -2 / 3
     MI = np.zeros((n_res, n_res))
     GC = np.zeros((n_res, n_res))
-    for i in prange(n_res):
-        for j in range(i + 1, n_res):
-            ij_loc = np.concatenate((R_locators[i], R_locators[j]))
-            dR = R[ij_loc]
 
-            numerator = np.linalg.det(np.dot(dR, dR.T) / n_frames)
+    # Pre-compute individual covariance matrices for each residue
+    C_blocks = np.empty((n_res, 3, 3))
+    for i in prange(n_res):
+        dR_i = R[R_locators[i]]
+        C_blocks[i] = np.dot(dR_i, dR_i.T) / n_frames
+
+    # Vectorized computation of pairwise MI and GC
+    for i in prange(n_res):
+        # Extract residue i data once
+        dR_i = R[R_locators[i]]
+        C_ii = C_blocks[i]
+
+        # Process all j > i in vectorized manner (within constraints of numba)
+        for j in range(i + 1, n_res):
+            dR_j = R[R_locators[j]]
+            C_jj = C_blocks[j]
+
+            # Cross-covariance block
+            C_ij = np.dot(dR_i, dR_j.T) / n_frames
+
+            # Build 6x6 block covariance matrix
+            # [C_ii  C_ij]
+            # [C_ij.T C_jj]
+            C_block = np.empty((6, 6))
+            C_block[:3, :3] = C_ii
+            C_block[:3, 3:] = C_ij
+            C_block[3:, :3] = C_ij.T
+            C_block[3:, 3:] = C_jj
+
+            numerator = np.linalg.det(C_block)
             denominator = C_i[i] * C_i[j]
+
             mutual_info = -0.5 * np.log(numerator / denominator)
             gen_corr = np.sqrt(1 - np.exp(k * mutual_info))
 
             MI[i, j] = mutual_info
             GC[i, j] = gen_corr
-    return MI, GC
 
+    return MI, GC
 
 @njit(parallel=True, fastmath=True)
 def calc_c_i(n_res, n_frames, R_locators, R):
