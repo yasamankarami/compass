@@ -44,23 +44,10 @@ def calc_min_dist(coords1, coords2):
     Returns:
         The minimum distance between two sets of coordinates
     """
-    # Constants
-    n1 = coords1.shape[0]
-    n2 = coords2.shape[0]
+    diff = coords1[:, np.newaxis, :] - coords2[np.newaxis, :, :]
+    dist_squared = np.sum(diff ** 2, axis=2)
 
-    # Find minimum distance using square values to save time
-    min_dist_squared = np.inf
-    for i in range(n1):
-        for j in range(n2):
-            dist_squared = (
-                    (coords1[i][0] - coords2[j][0]) ** 2
-                    + (coords1[i][1] - coords2[j][1]) ** 2
-                    + (coords1[i][2] - coords2[j][2]) ** 2
-            )
-            if dist_squared < min_dist_squared:
-                min_dist_squared = dist_squared
-    return np.sqrt(min_dist_squared)
-
+    return np.sqrt(np.min(dist_squared))
 
 @njit(parallel=False)
 def calc_single_angle(d, h, a):
@@ -89,9 +76,43 @@ def calc_single_angle(d, h, a):
     angle_deg = np.rad2deg(angle_rad)
     return angle_deg
 
+@njit(parallel=False)
+def calc_angles_vectorized(coords_d, coords_h, coords_a):
+    """
+    Calculate all pairwise D-H-A angles
+
+    Args:
+        coords_d: donor coordinates, shape (n1, 3)
+        coords_h: hydrogen coordinates, shape (n1, 3)
+        coords_a: acceptor coordinates, shape (n2, 3)
+
+    Returns:
+        angles: array of shape (n1, n2) with angles in degrees
+    """
+    # Vectors from H to D and from H to A (matching your original: d - h, a - h)
+    # vec_dh: (n1, 1, 3) for broadcasting
+    vec_dh = coords_d[:, np.newaxis, :] - coords_h[:, np.newaxis, :]  # D - H
+    # vec_ah: (n1, n2, 3)
+    vec_ah = coords_a[np.newaxis, :, :] - coords_h[:, np.newaxis, :]  # A - H
+
+    # Compute dot products: sum over last axis
+    dot_product = np.sum(vec_dh * vec_ah, axis=2)  # shape: (n1, n2)
+
+    # Compute magnitudes
+    dh_norm = np.sqrt(np.sum(vec_dh ** 2, axis=2))  # shape: (n1, 1)
+    ah_norm = np.sqrt(np.sum(vec_ah ** 2, axis=2))  # shape: (n1, n2)
+
+    # Compute cosine and clip to avoid numerical errors from floating point
+    cos_angle = dot_product / (dh_norm * ah_norm + 1e-10)
+    cos_angle = np.clip(cos_angle, -1.0, 1.0)
+
+    # Convert to degrees
+    angles = np.rad2deg(np.arccos(cos_angle))
+
+    return angles
 
 @njit(parallel=False)
-def find_sb(frame_coords, oxy_i, nitro_j, k):
+def find_sb(frame_coords, oxy_i, nitro_j, cut_off):
     """
     Find a single salt bridge between two residues
 
@@ -99,37 +120,33 @@ def find_sb(frame_coords, oxy_i, nitro_j, k):
         frame_coords: 3D coordinates of the frame
         oxy_i: oxygen atom index of the first residue
         nitro_j: nitrogen atom index of the second residue
-        k: cutoff distance
+        cut_off: cutoff distance
 
     Returns:
         bool: True if a salt bridge is found, False otherwise
     """
-    # Constants
-    n1 = oxy_i.size
-    n2 = nitro_j.size
-    min_dist_squared = k ** k
+    # Get coordinates for all oxygen and nitrogen atoms
+    coords1 = frame_coords[oxy_i]  # shape: (n1, 3)
+    coords2 = frame_coords[nitro_j]  # shape: (n2, 3)
 
-    # Find minimum distance using square values to save time
-    for i in range(n1):
-        coords1 = frame_coords[oxy_i[i]]
-        for j in range(n2):
-            coords2 = frame_coords[nitro_j[j]]
+    # Compute all pairwise distances using broadcasting
+    # coords1[:, np.newaxis, :] has shape (n1, 1, 3)
+    # coords2[np.newaxis, :, :] has shape (1, n2, 3)
+    # diff has shape (n1, n2, 3)
+    diff = coords1[:, np.newaxis, :] - coords2[np.newaxis, :, :]
 
-            dist_squared = (
-                    (coords1[0] - coords2[0]) ** 2
-                    + (coords1[1] - coords2[1]) ** 2
-                    + (coords1[2] - coords2[2]) ** 2
-            )
-            if dist_squared < min_dist_squared:
-                return True
-    return False
+    # Calculate squared distances: (n1, n2)
+    dist_squared = np.sum(diff ** 2, axis=2)
+
+    # Check if any distance is below cut off threshold
+    return np.any(dist_squared < cut_off * cut_off)
 
 
 @njit(parallel=False)
-def find_hb(frame_coords, donors_i, hydros_i, acceptors_j, da_cut, ha_cut,
-            dha_cut):
+def find_hb(frame_coords, donors_i, hydros_i, acceptors_j, da_cut, ha_cut, dha_cut):
     """
     Find a single hydrogen bond between two residues
+
     Args:
         frame_coords: 3D coordinates of the frame
         donors_i: donor atom indices of the first residue
@@ -142,26 +159,41 @@ def find_hb(frame_coords, donors_i, hydros_i, acceptors_j, da_cut, ha_cut,
     Returns:
         bool: True if a hydrogen bond is found, False otherwise
     """
-    # Constants
-    n1 = donors_i.size
-    n2 = acceptors_j.size
+    # Get all coordinates at once
+    coords_d = frame_coords[donors_i]  # shape: (n1, 3)
+    coords_h = frame_coords[hydros_i]  # shape: (n1, 3)
+    coords_a = frame_coords[acceptors_j]  # shape: (n2, 3)
 
-    # Find a suitable angle
-    for i in range(n1):
-        coords_d = frame_coords[donors_i[i]]
-        coords_h = frame_coords[hydros_i[i]]
-        for j in range(n2):
-            coords_a = frame_coords[acceptors_j[j]]
+    # Compute all pairwise donor-acceptor distances
+    # Broadcasting: (n1, 1, 3) - (1, n2, 3) = (n1, n2, 3)
+    diff_da = coords_d[:, np.newaxis, :] - coords_a[np.newaxis, :, :]
+    dist_da = np.sqrt(np.sum(diff_da ** 2, axis=2))  # shape: (n1, n2)
 
-            da_dist = calc_dist(coords_d, coords_a)
-            if da_dist < da_cut:
-                ha_dist = calc_dist(coords_h, coords_a)
-                if ha_dist < ha_cut:
-                    angle = calc_single_angle(coords_d, coords_h, coords_a)
-                    if angle > dha_cut:
-                        return True
-    return False
+    # Filter pairs that pass donor-acceptor distance cutoff
+    da_mask = dist_da < da_cut  # shape: (n1, n2)
 
+    # Early exit if no pairs pass first cutoff
+    if not np.any(da_mask):
+        return False
+
+    # Compute all pairwise hydrogen-acceptor distances
+    diff_ha = coords_h[:, np.newaxis, :] - coords_a[np.newaxis, :, :]
+    dist_ha = np.sqrt(np.sum(diff_ha ** 2, axis=2))  # shape: (n1, n2)
+
+    # Filter pairs that pass both distance cutoffs
+    ha_mask = dist_ha < ha_cut
+    combined_mask = da_mask & ha_mask  # shape: (n1, n2)
+
+    # Early exit if no pairs pass both distance cutoffs
+    if not np.any(combined_mask):
+        return False
+
+    # Compute angles only for pairs that passed distance filters
+    # Vectorized angle calculation for all pairs
+    angles = calc_angles_vectorized(coords_d, coords_h, coords_a)  # shape: (n1, n2)
+
+    # Check if any pair satisfies all criteria
+    return np.any(combined_mask & (angles > dha_cut))
 
 def save_matrix(arr, n, out_name, norm=False, prec=2):
     """
