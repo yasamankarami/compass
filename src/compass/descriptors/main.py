@@ -289,14 +289,24 @@ def get_frame_info(frame_coords, resids_to_atoms, resids_to_noh, nb_cut,
                 # Direct case
                 oxy_i = tt.dict_get(oxy, i)
                 nitro_j = tt.dict_get(nitro, j)
+                # print(f"oxy_i: {oxy_i}, nitro_j: -> {nitro_j}")
+                """
                 if (oxy_i is not None) and (nitro_j is not None):
+                    sb += geom.find_sb(frame_coords, oxy_i, nitro_j, sb_cut)
+                """
+                if oxy_i.size > 0 and nitro_j.size > 0:
                     sb += geom.find_sb(frame_coords, oxy_i, nitro_j, sb_cut)
 
                 # Inverse case
                 oxy_j = tt.dict_get(oxy, j)
                 nitro_i = tt.dict_get(nitro, i)
+                """
                 if (oxy_j is not None) and (nitro_i is not None):
                     sb += geom.find_sb(frame_coords, oxy_j, nitro_i, sb_cut)
+                """
+                if oxy_j.size > 0 and nitro_i.size > 0:
+                    sb += geom.find_sb(frame_coords, oxy_j, nitro_i, sb_cut)
+
             if sb:
                 pair_sb[index] = 1
 

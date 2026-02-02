@@ -411,7 +411,7 @@ def dict_get(dico, key):
         value = dico[key]
         return value
     except:
-        return None
+        return np.empty(0, dtype=np.int32)
 
 
 def pydict_to_numbadict(py_dict):
