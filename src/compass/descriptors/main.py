@@ -15,9 +15,21 @@ import compass.descriptors.topo_traj as tt
 # todo: update the docstrings
 
 
-def compute_descriptors(mini_traj, trajs, arg, resids_to_atoms, resids_to_noh,
-                        calphas, oxy, nitro, donors, hydros, acceptors,
-                        corr_indices, first_timer):
+def compute_descriptors(
+        mini_traj,
+        trajs,
+        arg,
+        resids_to_atoms,
+        resids_to_noh,
+        calphas,
+        oxy,
+        nitro,
+        donors,
+        hydros,
+        acceptors,
+        corr_indices,
+        first_timer
+):
     """
     Compute the compass descriptors for the trajectory
 
@@ -51,13 +63,25 @@ def compute_descriptors(mini_traj, trajs, arg, resids_to_atoms, resids_to_noh,
     pair_int_sum = np.zeros(n_pairs)
 
     # Compile numba function
-    get_chunk_info(mini_traj.xyz, resids_to_atoms, resids_to_noh, arg.nb_cut,
-                   arg.sb_cut, arg.da_cut, arg.ha_cut, arg.dha_cut, calphas,
-                   oxy, nitro, donors, hydros, acceptors)
+    get_chunk_info(
+        mini_traj.xyz,
+        resids_to_atoms,
+        resids_to_noh,
+        arg.nb_cut,
+        arg.sb_cut,
+        arg.da_cut,
+        arg.ha_cut,
+        arg.dha_cut,
+        calphas,
+        oxy,
+        nitro,
+        donors,
+        hydros,
+        acceptors
+    )
 
     comp_time = round(time.time() - first_timer, 2)
-    print(
-        f" ⏱️  Until compilation of descriptors-related functions: {comp_time} s")
+    print(f" ⏱️  Until compilation of descriptors-related functions: {comp_time} s")
 
     # Do a first pass to compute most descriptors
     chunks = tt.get_xyz_chunks(trajs, arg.topo, chunk_size=100)
@@ -65,10 +89,22 @@ def compute_descriptors(mini_traj, trajs, arg, resids_to_atoms, resids_to_noh,
     n_frames = 0
     for chunk in chunks:
         n_frames += chunk.shape[0]
-        pair_min_dist, pair_cp, pair_nb, pair_sb, pair_hb, pair_int = \
-            get_chunk_info(chunk, resids_to_atoms, resids_to_noh, arg.nb_cut,
-                           arg.sb_cut, arg.da_cut, arg.ha_cut, arg.dha_cut,
-                           calphas, oxy, nitro, donors, hydros, acceptors)
+        pair_min_dist, pair_cp, pair_nb, pair_sb, pair_hb, pair_int = get_chunk_info(
+            chunk,
+            resids_to_atoms,
+            resids_to_noh,
+            arg.nb_cut,
+            arg.sb_cut,
+            arg.da_cut,
+            arg.ha_cut,
+            arg.dha_cut,
+            calphas,
+            oxy,
+            nitro,
+            donors,
+            hydros,
+            acceptors
+        )
 
         pair_min_dist_sum = sum_arrays(pair_min_dist, pair_min_dist_sum)
         pair_cp_sum = sum_arrays(pair_cp, pair_cp_sum)
@@ -158,21 +194,31 @@ def get_chunk_info(traj_coords, resids_to_atoms, resids_to_noh, nb_cut, sb_cut,
     # Compute all interactions for each frame in parallel
     for frame in prange(n_frames):
         frame_coords = traj_coords[frame]
-        pair_min_dists, pair_nb, pair_cp, pair_sb, pair_hb, pair_int = \
-            get_frame_info(frame_coords, resids_to_atoms, resids_to_noh,
-                           nb_cut, sb_cut, da_cut, ha_cut, dha_cut, calphas,
-                           oxy, nitro, donors, hydros, acceptors, )
+        pair_min_dists, pair_nb, pair_cp, pair_sb, pair_hb, pair_int = get_frame_info(
+            frame_coords,
+            resids_to_atoms,
+            resids_to_noh,
+            nb_cut, sb_cut,
+            da_cut,
+            ha_cut,
+            dha_cut,
+            calphas,
+            oxy,
+            nitro,
+            donors,
+            hydros,
+            acceptors,
+        )
 
-        # Uptade the sum of interactions
+        # Update the sum of interactions
         pair_min_dist_sum += pair_min_dists
         pair_cp_sum += pair_cp
         pair_nb_sum += pair_nb
         pair_sb_sum += pair_sb
         pair_hb_sum += pair_hb
         pair_int_sum += pair_int
-    return (
-    pair_min_dist_sum, pair_cp_sum, pair_nb_sum, pair_sb_sum, pair_hb_sum,
-    pair_int_sum)
+
+    return pair_min_dist_sum, pair_cp_sum, pair_nb_sum, pair_sb_sum, pair_hb_sum, pair_int_sum
 
 
 @njit(parallel=True)

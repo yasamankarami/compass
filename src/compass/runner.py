@@ -40,15 +40,28 @@ def runner():
     # Prepare data structures
     (mini_traj, trajs, resids_to_atoms, resids_to_noh, calphas, oxy, nitro,
      donors, hydros, acceptors, corr_indices) = tt.prepare_datastructures(
-        arg, first_timer)
+        arg,
+        first_timer
+    )
 
     # =========================================================================
     # 2. Compute descriptors
     # =========================================================================
-    (ave_min_dist, occ_nb, cp, occ_sb, occ_hb, occ_int, mi,
-     gc) = mm.compute_descriptors(mini_traj, trajs, arg, resids_to_atoms,
-                                  resids_to_noh, calphas, oxy, nitro, donors,
-                                  hydros, acceptors, corr_indices, first_timer)
+    (ave_min_dist, occ_nb, cp, occ_sb, occ_hb, occ_int, mi, gc) = mm.compute_descriptors(
+        mini_traj,
+        trajs,
+        arg,
+        resids_to_atoms,
+        resids_to_noh,
+        calphas,
+        oxy,
+        nitro,
+        donors,
+        hydros,
+        acceptors,
+        corr_indices,
+        first_timer
+    )
     # invert CP matrix
     cp = abs(cp - max(cp))
 
@@ -57,8 +70,19 @@ def runner():
     # =========================================================================
     n = len(resids_to_atoms)
     matrices, matrices_names = geom.process_matrices(
-        arg, n, calphas, ave_min_dist, occ_nb, cp, occ_sb, occ_hb, occ_int, mi,
-        gc, first_timer)
+        arg,
+        n,
+        calphas,
+        ave_min_dist,
+        occ_nb,
+        cp,
+        occ_sb,
+        occ_hb,
+        occ_int,
+        mi,
+        gc,
+        first_timer
+    )
 
     # =========================================================================
     # 4. Perform PCA & generate adjacency matrix from PCA results
@@ -80,7 +104,14 @@ def runner():
     # Create a PDB for the network visualization
     dirname, filename = os.path.split(arg.topo)
     pdb_name = join(dirname, f'{filename.split(".")[0]}_internal.pdb')
-    parsed = next(md.iterload(arg.traj, top=arg.topo, chunk=1))
+    # Make trajectory mdtraj-compatible
+    traj = arg.traj
+    if isinstance(traj, str):
+        traj = traj.split()
+
+    first_traj = traj[0]   # md.iterload needs a SINGLE filename
+
+    parsed = next(md.iterload(first_traj, top=arg.topo, chunk=1))
     parsed.save_pdb(pdb_name)
     arg.pdb_file_path = pdb_name
 
@@ -94,31 +125,42 @@ def runner():
     print(f' ⏳  Until network parameters computed: {network_time} s')
 
     # Compute communities and cliques
-    gn.process_graph_files_for_communities_and_cliques(arg.network_dir,
-                                                       dist_cutoffs[0],
-                                                       dist_cutoffs[1])
+    gn.process_graph_files_for_communities_and_cliques(
+        arg.network_dir,
+        dist_cutoffs[0],
+        dist_cutoffs[1]
+    )
     clique_time = round(time.time() - first_timer, 2)
     print(f' ⏳  Until communities and cliques detection: {clique_time} s')
 
     # =========================================================================
     # 6. Generate PyMOL scripts
     # =========================================================================
-    gn.generate_pymol_scripts(arg.network_dir, arg.pdb_file_path,
-                              dist_cutoffs[0], dist_cutoffs[1])
+    gn.generate_pymol_scripts(
+        arg.network_dir,
+        arg.pdb_file_path,
+        dist_cutoffs[0],
+        dist_cutoffs[1]
+    )
     if dict_arg["paths"]["find_path"] == 'True':
         source_residues = dict_arg["paths"]["sources"].split(",")
         target_residues = dict_arg["paths"]["targets"].split(",")
 
         for source_residue in source_residues:
             for target_residue in target_residues:
-                gn.find_paths(arg.pdb_file_path, arg.network_dir,
-                              dist_cutoffs[0], source_residue.strip(),
-                              target_residue.strip())
+                gn.find_paths(
+                    arg.pdb_file_path,
+                    arg.network_dir,
+                    dist_cutoffs[0],
+                    source_residue.strip(),
+                    target_residue.strip()
+                )
 
     end_resources, end_time = resource_usage(RUSAGE_SELF), timestamp()
     real_time = end_time - start_time
     user_time = end_resources.ru_utime - start_resources.ru_utime
     system_time = end_resources.ru_stime - start_resources.ru_stime
+
     print(f" ⏳  User Time: {user_time:.2f} seconds")
     print(f" ⏳  System Time: {system_time:.2f} seconds")
     print(f" ⏳  Wall Clock Time: {real_time:.2f} seconds")

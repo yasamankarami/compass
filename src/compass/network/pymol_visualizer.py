@@ -283,11 +283,16 @@ class PyMOLVisualizer:
             with open(nodes_file, 'r') as f:
                 for line in f:
                     if line.strip().startswith("Node"):
-                        # Extract residue number and chain ID
-                        node_data = line.split("Node (")[1].split(")")[
-                            0].split(",")
-                        res_num = int(node_data[0].strip())
+                        node_data = line.split("Node (")[1].split(")")[0].split(",")
+
+                        res_str = node_data[0].strip()
                         chain_id = node_data[1].strip()
+
+                        # Skip unmapped nodes
+                        if res_str == "Unknown" or chain_id == "Unknown":
+                            continue
+
+                        res_num = int(res_str)
                         residue_info.append((res_num, chain_id))
 
             # Generate the PyMOL script
