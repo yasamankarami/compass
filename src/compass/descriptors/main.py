@@ -84,7 +84,7 @@ def compute_descriptors(
     print(f" ⏱️  Until compilation of descriptors-related functions: {comp_time} s")
 
     # Do a first pass to compute most descriptors
-    chunks = tt.get_xyz_chunks(trajs, arg.topo, chunk_size=100)
+    chunks = tt.get_xyz_chunks(trajs, arg.topo, chunk_size=arg.chunk_size)
     # print(np.shape(trajs))
     n_frames = 0
     for chunk in chunks:
@@ -123,7 +123,7 @@ def compute_descriptors(
 
     # Do a 2nd pass to compute cp & extract coords for correlation matrices
     pair_cp_sum2 = np.zeros(n_pairs)
-    chunks = tt.get_xyz_chunks(trajs, arg.topo, chunk_size=100)
+    chunks = tt.get_xyz_chunks(trajs, arg.topo, chunk_size=arg.chunk_size)
     corr_coords = np.zeros((n_frames, len(corr_indices), 3))
 
     k = 0
@@ -138,6 +138,9 @@ def compute_descriptors(
         corr_coords[k: k + corr_chunk.shape[0], :] = corr_chunk
         k += corr_chunk.shape[0]
     cp = pair_cp_sum2 / n_frames * 100
+
+    running_time = round(time.time() - first_timer, 2)
+    print(f" ⏱️  Before GC Matrix computed: {running_time} s")
 
     # Compute MI & GC
     mi, gc = corr.compute_gc_matrix(corr_coords, num_atoms_per_residue=3)
@@ -265,9 +268,22 @@ def get_chunk_cp(traj_coords, resids_to_atoms, pair_cp_sum, calphas):
 
 
 @njit(parallel=False)
-def get_frame_info(frame_coords, resids_to_atoms, resids_to_noh, nb_cut,
-                   sb_cut, da_cut, ha_cut, dha_cut, calphas, oxy, nitro,
-                   donors, hydros, acceptors):
+def get_frame_info(
+        frame_coords,
+        resids_to_atoms,
+        resids_to_noh,
+        nb_cut,
+        sb_cut,
+        da_cut,
+        ha_cut,
+        dha_cut,
+        calphas,
+        oxy,
+        nitro,
+        donors,
+        hydros,
+        acceptors
+):
     """
     Args:
         frame_coords: xyz coordinates of the frame
@@ -336,20 +352,12 @@ def get_frame_info(frame_coords, resids_to_atoms, resids_to_noh, nb_cut,
                 oxy_i = tt.dict_get(oxy, i)
                 nitro_j = tt.dict_get(nitro, j)
                 # print(f"oxy_i: {oxy_i}, nitro_j: -> {nitro_j}")
-                """
-                if (oxy_i is not None) and (nitro_j is not None):
-                    sb += geom.find_sb(frame_coords, oxy_i, nitro_j, sb_cut)
-                """
                 if oxy_i.size > 0 and nitro_j.size > 0:
                     sb += geom.find_sb(frame_coords, oxy_i, nitro_j, sb_cut)
 
                 # Inverse case
                 oxy_j = tt.dict_get(oxy, j)
                 nitro_i = tt.dict_get(nitro, i)
-                """
-                if (oxy_j is not None) and (nitro_i is not None):
-                    sb += geom.find_sb(frame_coords, oxy_j, nitro_i, sb_cut)
-                """
                 if oxy_j.size > 0 and nitro_i.size > 0:
                     sb += geom.find_sb(frame_coords, oxy_j, nitro_i, sb_cut)
 
@@ -365,16 +373,30 @@ def get_frame_info(frame_coords, resids_to_atoms, resids_to_noh, nb_cut,
                 hydros_i = tt.dict_get(hydros, i)
                 acceptors_j = tt.dict_get(acceptors, j)
                 if (donors_i is not None) and (acceptors_j is not None):
-                    hb += geom.find_hb(frame_coords, donors_i, hydros_i,
-                                       acceptors_j, da_cut, ha_cut, dha_cut)
+                    hb += geom.find_hb(
+                        frame_coords,
+                        donors_i,
+                        hydros_i,
+                        acceptors_j,
+                        da_cut,
+                        ha_cut,
+                        dha_cut
+                    )
 
                 # Inverse case
                 donors_j = tt.dict_get(donors, j)
                 hydros_j = tt.dict_get(hydros, j)
                 acceptors_i = tt.dict_get(acceptors, i)
                 if (donors_j is not None) and (acceptors_i is not None):
-                    hb += geom.find_hb(frame_coords, donors_j, hydros_j,
-                                       acceptors_i, da_cut, ha_cut, dha_cut)
+                    hb += geom.find_hb(
+                        frame_coords,
+                        donors_j,
+                        hydros_j,
+                        acceptors_i,
+                        da_cut,
+                        ha_cut,
+                        dha_cut
+                    )
             if hb:
                 pair_hb[index] = 1
 

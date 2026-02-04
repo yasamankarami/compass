@@ -11,6 +11,7 @@ from resource import getrusage as resource_usage, RUSAGE_SELF
 from time import time as timestamp
 import sys
 import mdtraj as md
+import numba
 
 import compass.descriptors.config as cfg
 import compass.descriptors.geometry as geom
@@ -30,12 +31,16 @@ def runner():
     # =========================================================================
     start_time, start_resources = timestamp(), resource_usage(RUSAGE_SELF)
     first_timer = time.time()
+
     # Parse configuration file
     if len(sys.argv) != 2:
-        raise ValueError(
-            '\ncompass syntax is: compass path-to-config-file')
+        raise ValueError('\ncompass syntax is: compass path-to-config-file')
+
     config_path = sys.argv[1]
     arg, dict_arg = cfg.parse_params(config_path)
+    # Set Number of threads to be used by Numba
+    numba.set_num_threads(arg.n_cores)
+    print("Numba threads:", numba.get_num_threads())
 
     # Prepare data structures
     (mini_traj, trajs, resids_to_atoms, resids_to_noh, calphas, oxy, nitro,
@@ -47,7 +52,7 @@ def runner():
     # =========================================================================
     # 2. Compute descriptors
     # =========================================================================
-    (ave_min_dist, occ_nb, cp, occ_sb, occ_hb, occ_int, mi, gc) = mm.compute_descriptors(
+    ave_min_dist, occ_nb, cp, occ_sb, occ_hb, occ_int, mi, gc = mm.compute_descriptors(
         mini_traj,
         trajs,
         arg,

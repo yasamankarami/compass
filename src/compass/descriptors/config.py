@@ -6,7 +6,7 @@ from os.path import dirname, join, normpath
 
 allowed_params = {
     "generals": {"topology", "trajectory", "output_dir", "n_cores",
-                 "job_name"},
+                 "job_name", "chunk_size"},
     "non_bond": {"non_bond_cut"},
     "salt_bridges": {"NO_cut"},
     "hbonds": {"DA_cut", "HA_cut", "DHA_cut", "heavy"},
@@ -101,6 +101,7 @@ def parse_params(config_path):
     param_space.out_dir = normpath(join(root_dir, out_dir))
     param_space.topo = normpath(join(root_dir, topology))
     param_space.n_cores = int(param_dict["generals"]["n_cores"])
+    param_space.chunk_size = int(param_dict["generals"]["chunk_size"])
     param_space.title = param_dict["generals"]["job_name"]
 
     # Descriptor params
