@@ -57,6 +57,7 @@ def compute_descriptors(
     n_pairs = int(n_resids * (n_resids - 1) / 2)
     pair_min_dist_sum = np.zeros(n_pairs)
     pair_cp_sum = np.zeros(n_pairs)
+    pair_cp_sum_sq = np.zeros(n_pairs)
     pair_nb_sum = np.zeros(n_pairs)
     pair_sb_sum = np.zeros(n_pairs)
     pair_hb_sum = np.zeros(n_pairs)
@@ -83,13 +84,14 @@ def compute_descriptors(
     comp_time = round(time.time() - first_timer, 2)
     print(f" ⏱️  Until compilation of descriptors-related functions: {comp_time} s")
 
-    # Do a first pass to compute most descriptors
+    # Perform single pass to compute most descriptors
     chunks = tt.get_xyz_chunks(trajs, arg.topo, chunk_size=arg.chunk_size)
+    corr_coords_list = []
     # print(np.shape(trajs))
     n_frames = 0
     for chunk in chunks:
         n_frames += chunk.shape[0]
-        pair_min_dist, pair_cp, pair_nb, pair_sb, pair_hb, pair_int = get_chunk_info(
+        pair_min_dist, pair_cp, pair_cp_sq, pair_nb, pair_sb, pair_hb, pair_int = get_chunk_info(
             chunk,
             resids_to_atoms,
             resids_to_noh,
@@ -108,10 +110,14 @@ def compute_descriptors(
 
         pair_min_dist_sum = sum_arrays(pair_min_dist, pair_min_dist_sum)
         pair_cp_sum = sum_arrays(pair_cp, pair_cp_sum)
+        pair_cp_sum_sq += sum_arrays(pair_cp_sq, pair_cp_sum_sq)
         pair_nb_sum = sum_arrays(pair_nb, pair_nb_sum)
         pair_sb_sum = sum_arrays(pair_sb, pair_sb_sum)
         pair_hb_sum = sum_arrays(pair_hb, pair_hb_sum)
         pair_int_sum = sum_arrays(pair_int, pair_int_sum)
+
+        # Extract correlation coordinates
+        corr_coords_list.append(chunk[:, corr_indices])
 
     # Compute average values
     ave_min_dist = (pair_min_dist_sum / n_frames) * 10
@@ -121,26 +127,13 @@ def compute_descriptors(
     occ_hb = pair_hb_sum / n_frames
     occ_int = pair_int_sum / n_frames
 
-    # Do a 2nd pass to compute cp & extract coords for correlation matrices
-    pair_cp_sum2 = np.zeros(n_pairs)
-    chunks = tt.get_xyz_chunks(trajs, arg.topo, chunk_size=arg.chunk_size)
-    corr_coords = np.zeros((n_frames, len(corr_indices), 3))
+    # Compute variance using: Var(X) = E[X²] - E[X]²
+    cp = ((pair_cp_sum_sq / n_frames) - (ave_pair_cp ** 2)) * 100
 
-    k = 0
-    get_chunk_cp(mini_traj.xyz, resids_to_atoms, ave_pair_cp, calphas)
-    for chunk in chunks:
-        # Compute CP
-        pair_cp2 = get_chunk_cp(chunk, resids_to_atoms, ave_pair_cp, calphas)
-        pair_cp_sum2 = sum_arrays(pair_cp2, pair_cp_sum2)
-
-        # Get correlation coordinates
-        corr_chunk = chunk[:, corr_indices]
-        corr_coords[k: k + corr_chunk.shape[0], :] = corr_chunk
-        k += corr_chunk.shape[0]
-    cp = pair_cp_sum2 / n_frames * 100
-
-    running_time = round(time.time() - first_timer, 2)
-    print(f" ⏱️  Before GC Matrix computed: {running_time} s")
+    ##########################*****************##########################
+    ########################## COMPUTE MI & GC ##########################
+    ##########################*****************##########################
+    corr_coords = np.concatenate(corr_coords_list, axis=0)
 
     # Compute MI & GC
     mi, gc = corr.compute_gc_matrix(corr_coords, num_atoms_per_residue=3)
@@ -189,6 +182,7 @@ def get_chunk_info(traj_coords, resids_to_atoms, resids_to_noh, nb_cut, sb_cut,
     # Initialize containers
     pair_min_dist_sum = np.zeros(n_pairs)
     pair_cp_sum = np.zeros(n_pairs)
+    pair_cp_sum_sq = np.zeros(n_pairs)
     pair_nb_sum = np.zeros(n_pairs)
     pair_sb_sum = np.zeros(n_pairs)
     pair_hb_sum = np.zeros(n_pairs)
@@ -216,12 +210,14 @@ def get_chunk_info(traj_coords, resids_to_atoms, resids_to_noh, nb_cut, sb_cut,
         # Update the sum of interactions
         pair_min_dist_sum += pair_min_dists
         pair_cp_sum += pair_cp
+        pair_cp_sum_sq += pair_cp * pair_cp  # accumulate X²
         pair_nb_sum += pair_nb
         pair_sb_sum += pair_sb
         pair_hb_sum += pair_hb
         pair_int_sum += pair_int
 
-    return pair_min_dist_sum, pair_cp_sum, pair_nb_sum, pair_sb_sum, pair_hb_sum, pair_int_sum
+    return (pair_min_dist_sum, pair_cp_sum, pair_cp_sum_sq,
+            pair_nb_sum, pair_sb_sum, pair_hb_sum, pair_int_sum)
 
 
 @njit(parallel=True)
