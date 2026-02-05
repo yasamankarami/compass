@@ -76,14 +76,25 @@ class CommunityDetector:
             dict: Dictionary mapping community indices to lists of nodes.
         """
         community_groups = {}
+        unknown_count = 0
         for node, comm_idx in communities.items():
             if comm_idx not in community_groups:
                 community_groups[comm_idx] = []
             # print(self.atom_mapping.keys())
+            # Try to get residue information
             res_name, atom_name, res_num, chain_id = self.atom_mapping.get(
                 str(node), ("Unknown", "Unknown", "Unknown", "Unknown"))
+
+            # FIX: Skip nodes with unknown residue information
+            if res_name == "Unknown" or chain_id == "Unknown" or res_num == "Unknown":
+                unknown_count += 1
+                continue
+
             str_node_details = f"{chain_id}_{res_num}"
             community_groups[comm_idx].append(str_node_details)
+
+            if unknown_count > 0:
+                print(f" ⚠️  Warning: Skipped {unknown_count} nodes with unknown residue information in communities")
         return community_groups
 
     def save_communities_to_file(self, communities, output_file):
@@ -192,9 +203,17 @@ class CliqueDetector:
             # Fetch atom details for each member
             res_name, atom_name, res_num, chain_id = self.atom_mapping.get(
                 str(member), ("Unknown", "Unknown", "Unknown", "Unknown"))
+
+            # FIX: Return None for unknown residues so they can be filtered
+            if res_name == "Unknown" or chain_id == "Unknown" or res_num == "Unknown":
+                return None
+
             # Prepare a string representing the node's details
             str_node_details = f"{chain_id}_{res_num}"
+
             return str_node_details
+
+        unknown_members = 0
 
         try:
             with open(output_file, 'w') as all_cliques_file:
@@ -203,10 +222,21 @@ class CliqueDetector:
                 for clique_idx, members in cliques.items():
                     # Apply get_details to each member in the clique
                     new_members = [get_details(member) for member in members]
+
+                    # FIX: Filter out None values (unknown residues)
+                    new_members = [m for m in new_members if m is not None]
+                    unknown_members += len(members) - len(new_members)
+
+                    # Skip empty cliques
+                    if not new_members:
+                        continue
+
                     # Write the clique with its members to the file
                     all_cliques_file.write(
                         f"Clique {clique_idx}: {', '.join(new_members)}\n")
 
+            if unknown_members > 0:
+                print(f" ⚠️  Warning: Skipped {unknown_members} nodes with unknown residue information in cliques")
             print(f" 🧩  Cliques saved to {output_file}")
 
         except IOError as e:
