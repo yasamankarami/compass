@@ -120,9 +120,11 @@ def process_graph_files(results_dir):
             top_nodes_file = os.path.join(results_dir, f"{prefix}_top_10_percent_nodes.txt")
             top_shortest_paths_file = os.path.join(results_dir, f"{prefix}_top_10_shortest_paths.txt")
             lengths_file = os.path.join(results_dir, f"{prefix}_shortest_path_lengths.txt")
-            shortest_paths = network_parameters.compute_shortest_paths(shortest_paths_file,            # File for all shortest paths
-                top_shortest_paths_file,           # File for the top 10 (or 50) shortest paths
-                num_processes=32)
+
+            shortest_paths = network_parameters.compute_shortest_paths(
+                shortest_paths_file,            # File for all shortest paths
+                top_shortest_paths_file,        # File for the top 10 (or 50) shortest paths
+            )
             # Calculate and save centralities
             centralities = network_parameters.calculate_centralities()
             network_parameters.save_centrality_measures(centralities, centralities_file)
