@@ -102,13 +102,14 @@ def runner():
     arg.adjacency_file = adj_name
     arg.min_dist_matrix_file = matrices_names["MINDIST"]
     arg.network_dir = join(dict_arg["generals"]["output_dir"], 'network')
+    arg.output_dir = dict_arg["generals"]["output_dir"]
     os.makedirs(arg.network_dir, exist_ok=True)
     dist_cutoffs = [dict_arg["distance cutoffs"]["Graph"],
                     dict_arg["distance cutoffs"]["Cliques"]]
 
     # Create a PDB for the network visualization
-    dirname, filename = os.path.split(arg.topo)
-    pdb_name = join(dirname, f'{filename.split(".")[0]}_internal.pdb')
+    _, filename = os.path.split(arg.topo)
+    pdb_name = join(arg.output_dir, f'{filename.split(".")[0]}_internal.pdb')
     # Make trajectory mdtraj-compatible
     traj = arg.traj
     if isinstance(traj, str):
