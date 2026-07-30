@@ -17,6 +17,7 @@ import compass.descriptors.config as cfg
 import compass.descriptors.geometry as geom
 import compass.descriptors.main as mm
 import compass.descriptors.pca as pca
+import compass.descriptors.create_adjacency as create_adjacency
 import compass.descriptors.topo_traj as tt
 import compass.network.generals as gn
 
@@ -71,7 +72,7 @@ def runner():
     cp = abs(cp - max(cp))
 
     # =========================================================================
-    # 3. Save matrices
+    # 3. Save matrices - GC, COMPROP, INTERACTIONS, MI, SATLBRIDGES
     # =========================================================================
     n = len(resids_to_atoms)
     matrices, matrices_names = geom.process_matrices(
@@ -88,12 +89,26 @@ def runner():
         gc,
         first_timer
     )
-
+    """
     # =========================================================================
     # 4. Perform PCA & generate adjacency matrix from PCA results
     # =========================================================================
     # Select the matrices to be used in the PCA
     adj_name = pca.run_pca(arg, matrices, n, first_timer)
+    """
+
+    # Create adjacency matrix from fusion
+    adj_name = geom.get_matrix_name(arg.out_dir, arg.title, "ADJACENCY")
+    adj_mat, evr = create_adjacency.edge_fused_adjacency(
+        mat_dict=matrices,
+        coupling_keys=["GC", "COMMPROP"],
+        mindist_key="MINDIST",
+        return_mode="features",
+        out_path=arg.out_dir/adj_name,
+    )
+    print(f"Adjacency - Explained Variance: {evr}")
+    matrix_name = "Adjacency matrix"
+    geom.plot_matrix(adj_mat, matrix_name, adj_name.replace(".mat", ".png"))
 
     # =========================================================================
     # 5. Perform network analyses
