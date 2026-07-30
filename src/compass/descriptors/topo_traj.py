@@ -8,6 +8,7 @@ import mdtraj as md
 import numpy as np
 from numba import njit
 from numba.typed.typeddict import Dict
+from numba.core import types
 
 '''
 def remap_toppology(topo, mini_traj, out_dir):
@@ -413,20 +414,45 @@ def dict_get(dico, key):
     except:
         return np.empty(0, dtype=np.int32)
 
+def _infer_numba_type(value):
+    """Map a Python/numpy value to a numba type usable in Dict.empty()."""
+    if isinstance(value, np.ndarray):
+        if value.dtype == np.int32:   return types.int32[:]
+        if value.dtype == np.int64:   return types.int64[:]
+        if value.dtype == np.float32: return types.float32[:]
+        if value.dtype == np.float64: return types.float64[:]
+        raise TypeError(f"Unsupported ndarray dtype: {value.dtype}")
+    if isinstance(value, (bool, np.bool_)):     return types.boolean
+    if isinstance(value, (int, np.integer)):    return types.int64
+    if isinstance(value, (float, np.floating)): return types.float64
+    if isinstance(value, str):                  return types.unicode_type
+    raise TypeError(f"Unsupported value type: {type(value)}")
 
-def pydict_to_numbadict(py_dict):
+def pydict_to_numbadict(py_dict, key_type=None, value_type=None):
     """
-    Converts from Python dict to Numba dict
+    Convert a Python dict into a numba.typed.Dict with an explicit signature.
 
-    Args:
-        py_dict: Python dict
-
-    Returns:
-        numba_dict: Numba dict
+    Compatible with numba >= 0.59, which no longer lazily infers element types
+    from ``Dict().update({k: v})``. Types are inferred from the first item
+    when not supplied; an empty input dict requires explicit ``key_type``
+    and ``value_type``.
     """
-    numba_dict = Dict()
-    for key in py_dict:
-        numba_dict.update({key: py_dict[key]})
+    if not py_dict:
+        if key_type is None or value_type is None:
+            raise ValueError(
+                "pydict_to_numbadict: cannot infer types from an empty dict; "
+                "pass key_type and value_type explicitly."
+            )
+        return Dict.empty(key_type=key_type, value_type=value_type)
+
+    first_key = next(iter(py_dict))
+    first_val = py_dict[first_key]
+    if key_type   is None: key_type   = _infer_numba_type(first_key)
+    if value_type is None: value_type = _infer_numba_type(first_val)
+
+    numba_dict = Dict.empty(key_type=key_type, value_type=value_type)
+    for k, v in py_dict.items():
+        numba_dict[k] = v
     return numba_dict
 
 
